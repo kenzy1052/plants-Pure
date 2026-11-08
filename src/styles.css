@@ -1,0 +1,536 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * PLANTS & PURE design system — brand palette supplied by the client (light + dark).
+ *   Light: red #B50606→#E31B1B, lime #A6F916→#6FBF00, background #FAF7F5, border #E8E8E8,
+ *          text #B50606 / #2D2D2D / #6B7280 / #FFFFFF.
+ *   Dark:  red #8F0000→#B50606, lime #7CD400→#A6F916, background #0F1115, border #1F2937,
+ *          text #FF4D4D / #F1F5F9 / #9CA3AF, on-accent #0F1115.
+ * Token names (pepper = brand red, sage/olive = lime tints) are kept so components don't change.
+ * Fonts: Newsreader (display), Inter (body).
+ */
+
+@theme inline {
+  --font-display: "Newsreader", "New York", ui-serif, Georgia, serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, monospace;
+  --font-hand: "Caveat", "Segoe Print", cursive;
+
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 4px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 6px);
+  --radius-2xl: calc(var(--radius) + 14px);
+  --radius-3xl: calc(var(--radius) + 22px);
+  --radius-4xl: calc(var(--radius) + 30px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+
+  /* Brand tokens */
+  --color-pepper: var(--pepper);
+  --color-pepper-hover: var(--pepper-hover);
+  --color-pepper-foreground: var(--pepper-foreground);
+  --color-sage: var(--sage);
+  --color-sage-strong: var(--sage-strong);
+  --color-olive: var(--olive);
+  --color-forest: var(--forest);
+  --color-forest-foreground: var(--forest-foreground);
+  --color-container: var(--container);
+  --color-surface: var(--surface);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-cursor: var(--cursor);
+  --color-brand: var(--brand-text);
+  --color-lime: var(--lime);
+  --color-lime-foreground: var(--lime-foreground);
+  --color-night: var(--night);
+  --color-night-2: var(--night-2);
+  --color-night-foreground: var(--night-foreground);
+  --color-night-muted: var(--night-muted);
+  --color-night-border: var(--night-border);
+  --color-night-accent: var(--night-accent);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+
+  --color-chart-1: var(--pepper);
+  --color-chart-2: var(--olive);
+  --color-chart-3: var(--forest);
+  --color-chart-4: var(--sage-strong);
+  --color-chart-5: var(--muted-foreground);
+  --color-sidebar: var(--card);
+  --color-sidebar-foreground: var(--foreground);
+  --color-sidebar-primary: var(--primary);
+  --color-sidebar-primary-foreground: var(--primary-foreground);
+  --color-sidebar-accent: var(--sage);
+  --color-sidebar-accent-foreground: var(--forest);
+  --color-sidebar-border: var(--border);
+  --color-sidebar-ring: var(--ring);
+
+  --ease-settle: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-swift: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --animate-marquee: marquee 60s linear infinite;
+  --animate-float-slow: float-slow 9s ease-in-out infinite;
+  --animate-glow: glow 7s ease-in-out infinite;
+}
+
+:root {
+  --radius: 1rem;
+
+  /* Neutrals (client palette, light) */
+  --background: #faf7f5;
+  --surface: #ffffff;
+  --container: #f3eeea;
+  --foreground: #2d2d2d;
+  --muted: #f3eeea;
+  --muted-foreground: #6b7280;
+  --border: #e8e8e8;
+  --input: #d6d3d1;
+
+  /* Brand red */
+  --pepper: #b50606;
+  --pepper-hover: #8f0000;
+  --pepper-foreground: #ffffff;
+  --brand-text: #b50606;
+  --red-from: #b50606;
+  --red-to: #e31b1b;
+
+  /* Lime accent + tints */
+  --lime: #a6f916;
+  --lime-from: #a6f916;
+  --lime-to: #6fbf00;
+  --lime-foreground: #0f1115;
+  --sage: #eaf9cf;
+  --sage-strong: #d3f28f;
+  --olive: #3f7d00;
+  --forest: #2d2d2d;
+  --forest-foreground: #faf7f5;
+
+  /* Always-dark "studio" surfaces (hero, footer, intro) */
+  --night: #0f1115;
+  --night-2: #161a21;
+  --night-foreground: #f1f5f9;
+  --night-muted: #9ca3af;
+  --night-border: #1f2937;
+  --night-accent: #ff5a5a;
+  --paper: #ffffff;
+  --ink: #2d2d2d;
+
+  --card: var(--surface);
+  --card-foreground: var(--foreground);
+  --popover: var(--surface);
+  --popover-foreground: var(--foreground);
+  --primary: var(--pepper);
+  --primary-foreground: var(--pepper-foreground);
+  --primary-hover: var(--pepper-hover);
+  --secondary: var(--sage);
+  --secondary-foreground: #1f3a00;
+  --accent: var(--sage-strong);
+  --accent-foreground: #1f3a00;
+  --destructive: #b91c1c;
+  --destructive-foreground: #ffffff;
+  --ring: #e31b1b;
+
+  --success: var(--olive);
+  --success-soft: var(--sage);
+  --warning: oklch(0.55 0.12 70);
+  --warning-soft: oklch(0.95 0.04 85);
+  --cursor: #b50606;
+
+  --shadow-soft: 0 1px 2px rgb(45 45 45 / 0.05), 0 14px 34px -14px rgb(45 45 45 / 0.16);
+  --shadow-lift: 0 2px 4px rgb(45 45 45 / 0.06), 0 34px 70px -28px rgb(143 0 0 / 0.38);
+
+  --header-h: 5.25rem;
+}
+
+.dark {
+  --background: #0f1115;
+  --surface: #151920;
+  --container: #1a1f27;
+  --foreground: #f1f5f9;
+  --muted: #1a1f27;
+  --muted-foreground: #9ca3af;
+  --border: #1f2937;
+  --input: #2b3646;
+
+  --pepper: #d82424;
+  --pepper-hover: #ee3a3a;
+  --pepper-foreground: #ffffff;
+  --brand-text: #ff4d4d;
+  --red-from: #8f0000;
+  --red-to: #b50606;
+
+  --lime: #a6f916;
+  --lime-from: #7cd400;
+  --lime-to: #a6f916;
+  --lime-foreground: #0f1115;
+  --sage: #1c2a0b;
+  --sage-strong: #2a3f10;
+  --olive: #a6f916;
+  --forest: #f1f5f9;
+  --forest-foreground: #0f1115;
+
+  --card: var(--surface);
+  --card-foreground: var(--foreground);
+  --popover: var(--surface);
+  --popover-foreground: var(--foreground);
+  --primary: var(--pepper);
+  --primary-foreground: var(--pepper-foreground);
+  --primary-hover: var(--pepper-hover);
+  --secondary: var(--sage);
+  --secondary-foreground: var(--foreground);
+  --accent: var(--sage-strong);
+  --accent-foreground: var(--foreground);
+  --destructive: #ef4444;
+  --destructive-foreground: #0f1115;
+  --ring: #ff4d4d;
+
+  --success: #a6f916;
+  --success-soft: #1c2a0b;
+  --warning: oklch(0.82 0.12 80);
+  --warning-soft: oklch(0.3 0.04 80);
+  --cursor: #a6f916;
+
+  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.3), 0 14px 34px -14px rgb(0 0 0 / 0.6);
+  --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.3), 0 34px 70px -28px rgb(143 0 0 / 0.55);
+  color-scheme: dark;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    overflow-x: hidden;
+    transition: background-color 0.4s var(--ease-settle), color 0.4s var(--ease-settle);
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    font-optical-sizing: auto;
+  }
+  ::selection {
+    background-color: var(--color-pepper);
+    color: var(--color-pepper-foreground);
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+}
+
+/* ---------- Typography scale ---------- */
+@utility type-hero {
+  font-family: var(--font-display);
+  font-size: clamp(2.7rem, 1.6rem + 4.6vw, 5.6rem);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  font-weight: 400;
+}
+@utility type-page {
+  font-family: var(--font-display);
+  font-size: clamp(2.3rem, 1.6rem + 2.8vw, 3.9rem);
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+}
+@utility type-section {
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 1.4rem + 1.9vw, 3rem);
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+}
+@utility type-sub {
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 1.1rem + 0.9vw, 1.85rem);
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+}
+@utility type-product {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.005em;
+}
+@utility type-lead {
+  font-family: var(--font-sans);
+  font-size: clamp(1.05rem, 0.95rem + 0.4vw, 1.25rem);
+  line-height: 1.6;
+}
+@utility type-body {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+@utility type-small {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+@utility type-label {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+@utility type-hand {
+  font-family: var(--font-hand);
+  font-weight: 600;
+  line-height: 1;
+}
+@utility type-nav {
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+/* ---------- Layout ---------- */
+@utility container-page {
+  width: 100%;
+  max-width: 88rem;
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 0.4rem + 2.6vw, 3rem);
+}
+@utility section-space {
+  padding-block: clamp(4.5rem, 2.5rem + 7vw, 9rem);
+}
+
+/* ---------- Line animations (Foodo-style) ---------- */
+@utility link-line {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -3px;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right center;
+    transition: transform 0.45s var(--ease-settle);
+  }
+  &:hover::after,
+  &[data-status="active"]::after,
+  &[aria-current="page"]::after {
+    transform: scaleX(1);
+    transform-origin: left center;
+  }
+}
+@utility rule-draw {
+  height: 1px;
+  background: var(--color-border);
+  transform-origin: left center;
+}
+
+/* ---------- Shadows / surfaces ---------- */
+@utility shadow-soft {
+  box-shadow: var(--shadow-soft);
+}
+@utility shadow-lift {
+  box-shadow: var(--shadow-lift);
+}
+@utility glass {
+  background: color-mix(in oklch, var(--color-surface) 78%, transparent);
+  backdrop-filter: saturate(1.4) blur(18px);
+  -webkit-backdrop-filter: saturate(1.4) blur(18px);
+}
+
+/* ---------- Brand surfaces ---------- */
+@utility bg-brand-gradient {
+  background-image: linear-gradient(135deg, var(--red-from), var(--red-to));
+}
+@utility bg-lime-gradient {
+  background-image: linear-gradient(135deg, var(--lime-from), var(--lime-to));
+}
+@utility text-brand-gradient {
+  background-image: linear-gradient(135deg, var(--red-from), var(--red-to));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+/* Product photos are shot on black: feather their edges so they melt into a dark stage */
+@utility feather {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent), linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent), linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+@utility stage {
+  background:
+    radial-gradient(60% 55% at 72% 48%, rgb(227 27 27 / 0.28), transparent 70%),
+    radial-gradient(40% 40% at 18% 90%, rgb(166 249 22 / 0.09), transparent 70%),
+    radial-gradient(70% 80% at 70% 50%, #050506 0%, var(--night) 100%);
+}
+@utility grain {
+  position: relative;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.06;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+}
+
+/* ---------- Motion ---------- */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes float-slow {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(var(--r, 0deg)); }
+  50% { transform: translate3d(0, -14px, 0) rotate(calc(var(--r, 0deg) + 4deg)); }
+}
+@keyframes glow {
+  0%, 100% { opacity: 0.75; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+@keyframes rise-in {
+  from { opacity: 0; transform: translate3d(0, 46px, 0) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes line-up {
+  from { transform: translate3d(0, 110%, 0); }
+  to { transform: none; }
+}
+
+/* Scroll reveals: play when an element enters the viewport from either direction. */
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 34px, 0);
+  filter: blur(6px);
+  transition: opacity 1s var(--ease-settle), transform 1s var(--ease-settle), filter 1s var(--ease-settle);
+  transition-delay: var(--d, 0ms);
+  will-change: opacity, transform;
+}
+.reveal[data-variant="fade"] { transform: none; }
+.reveal[data-variant="scale"] { transform: scale(0.94); }
+.reveal[data-variant="left"] { transform: translate3d(-48px, 0, 0); }
+.reveal[data-variant="right"] { transform: translate3d(48px, 0, 0); }
+.reveal[data-variant="mask"] { transform: none; filter: none; clip-path: inset(0 0 100% 0 round 1.5rem); transition-property: clip-path, opacity; }
+.reveal[data-in="true"] {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+.reveal[data-variant="mask"][data-in="true"] { clip-path: inset(0 0 0 0 round 1.5rem); }
+.reveal-up[data-dir="up"]:not([data-in="true"]):not([data-variant]) {
+  transform: translate3d(0, -34px, 0);
+}
+
+/* Header scroll progress */
+.scroll-progress {
+  transform-origin: left center;
+  transform: scaleX(var(--p, 0));
+}
+
+/* Endless product loop: the list is rendered twice and the track slides by exactly half. */
+.loop-viewport {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+}
+.loop-track {
+  display: flex;
+  width: max-content;
+  gap: 1rem;
+  padding-right: 1rem; /* equals the gap, so the seam between the two copies is the same as every other gap */
+  animation: marquee var(--loop-duration, 70s) linear infinite;
+  will-change: transform;
+}
+.loop-viewport:hover .loop-track,
+.loop-viewport:focus-within .loop-track { animation-play-state: paused; }
+
+/* Horizontal rails */
+.rail {
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+}
+.rail::-webkit-scrollbar { display: none; }
+.rail > * { scroll-snap-align: start; }
+
+/* Custom cursor: native cursor hidden only once the custom one is confirmed running */
+html.has-custom-cursor,
+html.has-custom-cursor * {
+  cursor: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal { opacity: 1; transform: none; filter: none; clip-path: none; }
+  html { scroll-behavior: auto; }
+  /* No auto-motion: the loop becomes a normal swipeable row. */
+  .loop-viewport { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
+  .loop-track { animation: none !important; }
+  .loop-track [data-loop-copy="2"] { display: none; }
+}
+
+/* Intro overlay is server-rendered; hidden instantly when already seen this session */
+html[data-intro-seen] .pp-intro { display: none; }
+
+/* ---------- Hero entrance: starts once the brand intro is leaving (or was already seen) ---------- */
+.hero-item { opacity: 0; }
+.hero-line { display: block; overflow: hidden; padding-bottom: 0.12em; margin-bottom: -0.12em; }
+.hero-line > span { display: block; transform: translate3d(0, 112%, 0); }
+html[data-intro-seen] .hero-item,
+html[data-hero-go] .hero-item {
+  animation: rise-in 1.3s var(--ease-settle) both;
+  animation-delay: calc(var(--i, 0) * 110ms);
+}
+html[data-intro-seen] .hero-line > span,
+html[data-hero-go] .hero-line > span {
+  animation: line-up 1.25s var(--ease-settle) both;
+  animation-delay: calc(var(--i, 0) * 130ms);
+}

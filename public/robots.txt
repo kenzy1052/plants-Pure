@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /account
+Disallow: /checkout
+Disallow: /auth/
+Disallow: /api/
+
+Sitemap: https://www.plantsandpure.com/sitemap.xml

@@ -1,0 +1,1319 @@
+const fs = require("fs");
+const path = require("path");
+
+const files = {
+  // 1. Utility Helpers
+  "src/lib/utils.ts": `import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
+export function formatGHS(amount: number): string {
+  return \`GH₵ \${Number(amount).toFixed(2)}\`;
+}
+
+export const DELIVERY_ZONES: { [key: string]: number } = {
+  'East Legon / Adjiringanor': 30,
+  'Airport Residential / Cantonments': 30,
+  'Osu / Ridge / Labone': 30,
+  'Spintex / Sakumono': 35,
+  'Madina / Adenta': 35,
+  'Tema (Community 1-25)': 45,
+  'Dansoman / Kaneshie': 35,
+  'Achimota / Dome / West Legon': 35,
+  'Kumasi / Intercity (Courier)': 60,
+  'Pick up in Accra (Free)': 0,
+};
+`,
+
+  // 2. Navigation Bar
+  "src/components/ui/Navbar.tsx": `'use client';
+
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { ShoppingBag, Menu, X, Sparkles, Search } from 'lucide-react';
+import { useCartStore } from '@/context/cart-store';
+
+export default function Navbar() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { items, openCart } = useCartStore();
+
+  const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
+
+  return (
+    <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-[#FAF7F2]/90 border-b border-[#2E4A3E]/10 transition-all">
+      <div className="bg-[#2E4A3E] text-[#FAF7F2] text-xs py-2 px-4 text-center font-medium tracking-wide flex items-center justify-center gap-2">
+        <Sparkles className="w-3.5 h-3.5 text-[#E6C687]" />
+        <span>100% Pure Ghanaian Botanicals • Free Accra Delivery on orders above GH₵ 350</span>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="md:hidden p-2 text-[#2E4A3E] focus:outline-none"
+          aria-label="Toggle Menu"
+        >
+          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6 text-[#2E4A3E]" />}
+        </button>
+
+        <Link href="/" className="flex flex-col items-center md:items-start group">
+          <span className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#2E4A3E] group-hover:text-[#C86D51] transition-colors">
+            Plants &amp; Pure
+          </span>
+          <span className="text-[10px] tracking-[0.25em] text-[#2E4A3E]/70 uppercase -mt-1 font-sans">
+            Botanical Pantry
+          </span>
+        </Link>
+
+        <nav className="hidden md:flex items-center space-x-8 text-sm font-medium text-[#2E4A3E]">
+          <Link href="/shop" className="hover:text-[#C86D51] transition-colors">
+            All Products
+          </Link>
+          <Link href="/shop?category=culinary-spices" className="hover:text-[#C86D51] transition-colors">
+            Culinary Spices
+          </Link>
+          <Link href="/shop?category=herbal-infusions" className="hover:text-[#C86D51] transition-colors">
+            Herbs &amp; Teas
+          </Link>
+          <Link href="/shop?category=pure-botanical-oils" className="hover:text-[#C86D51] transition-colors">
+            Natural Oils
+          </Link>
+        </nav>
+
+        <div className="flex items-center space-x-4">
+          <Link
+            href="/shop"
+            className="p-2 text-[#2E4A3E] hover:text-[#C86D51] transition-colors"
+            aria-label="Search Catalog"
+          >
+            <Search className="w-5 h-5" />
+          </Link>
+
+          <button
+            onClick={openCart}
+            className="relative p-2.5 rounded-full bg-[#2E4A3E] text-[#FAF7F2] hover:bg-[#C86D51] transition-all duration-300 shadow-sm"
+            aria-label="Open Shopping Cart"
+          >
+            <ShoppingBag className="w-5 h-5" />
+            {totalItems > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 bg-[#C86D51] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#FAF7F2] animate-pulse">
+                {totalItems}
+              </span>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {mobileMenuOpen && (
+        <div className="md:hidden border-b border-[#2E4A3E]/10 bg-[#FAF7F2] px-6 py-6 space-y-4">
+          <Link
+            href="/shop"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block text-base font-medium text-[#2E4A3E] hover:text-[#C86D51]"
+          >
+            All Pantry Products
+          </Link>
+          <Link
+            href="/shop?category=culinary-spices"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block text-base font-medium text-[#2E4A3E] hover:text-[#C86D51]"
+          >
+            Artisanal Spices
+          </Link>
+          <Link
+            href="/shop?category=herbal-infusions"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block text-base font-medium text-[#2E4A3E] hover:text-[#C86D51]"
+          >
+            Herbal Infusions
+          </Link>
+          <Link
+            href="/shop?category=pure-botanical-oils"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block text-base font-medium text-[#2E4A3E] hover:text-[#C86D51]"
+          >
+            Cold-Pressed Pure Oils
+          </Link>
+        </div>
+      )}
+    </header>
+  );
+}
+`,
+
+  // 3. Cart Drawer
+  "src/components/cart/CartDrawer.tsx": `'use client';
+
+import React from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { X, Plus, Minus, Trash2, ArrowRight, Truck } from 'lucide-react';
+import { useCartStore } from '@/context/cart-store';
+import { formatGHS } from '@/lib/utils';
+
+export default function CartDrawer() {
+  const { items, isOpen, closeCart, updateQuantity, removeItem, getSubtotal } = useCartStore();
+  const subtotal = getSubtotal();
+  const FREE_SHIPPING_THRESHOLD = 350;
+  const progressPercent = Math.min((subtotal / FREE_SHIPPING_THRESHOLD) * 100, 100);
+  const amountRemaining = FREE_SHIPPING_THRESHOLD - subtotal;
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 overflow-hidden">
+      <div
+        className="absolute inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
+        onClick={closeCart}
+      />
+
+      <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
+        <div className="w-screen max-w-md bg-[#FAF7F2] shadow-2xl flex flex-col">
+          <div className="p-6 border-b border-[#2E4A3E]/10 flex items-center justify-between bg-white">
+            <h2 className="font-serif text-xl font-bold text-[#2E4A3E]">Your Botanical Bag</h2>
+            <button
+              onClick={closeCart}
+              className="p-2 text-stone-500 hover:text-stone-900 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="bg-[#2E4A3E]/5 px-6 py-4 border-b border-[#2E4A3E]/10">
+            <div className="flex items-center gap-2 text-xs font-semibold text-[#2E4A3E] mb-1.5">
+              <Truck className="w-4 h-4 text-[#C86D51]" />
+              {amountRemaining > 0 ? (
+                <span>
+                  Add <strong className="text-[#C86D51]">{formatGHS(amountRemaining)}</strong> for Free Delivery in Accra!
+                </span>
+              ) : (
+                <span className="text-emerald-700 font-bold">🎉 You unlocked Free Delivery!</span>
+              )}
+            </div>
+            <div className="w-full bg-stone-200 h-2 rounded-full overflow-hidden">
+              <div
+                className="bg-[#2E4A3E] h-full rounded-full transition-all duration-500"
+                style={{ width: \`\${progressPercent}%\` }}
+              />
+            </div>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            {items.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-center py-12">
+                <div className="w-16 h-16 rounded-full bg-[#2E4A3E]/10 flex items-center justify-center text-[#2E4A3E] mb-4">
+                  🌿
+                </div>
+                <h3 className="font-serif text-lg font-semibold text-stone-800">Your bag is empty</h3>
+                <p className="text-stone-500 text-sm mt-1 max-w-xs">
+                  Discover our freshly ground natural spices and cold-pressed botanical oils.
+                </p>
+                <button
+                  onClick={closeCart}
+                  className="mt-6 px-6 py-2.5 bg-[#2E4A3E] text-white text-sm font-medium rounded-lg hover:bg-[#C86D51] transition-colors"
+                >
+                  Explore Catalog
+                </button>
+              </div>
+            ) : (
+              items.map(({ product, quantity }) => (
+                <div key={product.id} className="flex gap-4 pb-6 border-b border-stone-200">
+                  <div className="relative w-20 h-20 bg-stone-100 rounded-lg overflow-hidden shrink-0 border border-stone-200">
+                    <Image
+                      src={
+                        product.image_urls?.[0] ||
+                        'https://res.cloudinary.com/demo/image/upload/v1312461204/sample.jpg'
+                      }
+                      alt={product.title}
+                      fill
+                      className="object-cover"
+                      sizes="80px"
+                    />
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-start">
+                      <h4 className="font-medium text-stone-900 text-sm truncate pr-2">
+                        {product.title}
+                      </h4>
+                      <button
+                        onClick={() => removeItem(product.id)}
+                        className="text-stone-400 hover:text-red-600 transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <p className="text-xs text-stone-500 mt-0.5">{product.weight_grams}g pouch / jar</p>
+                    <p className="text-sm font-semibold text-[#2E4A3E] mt-1">
+                      {formatGHS(product.price)}
+                    </p>
+
+                    <div className="flex items-center gap-3 mt-3">
+                      <div className="flex items-center border border-stone-300 rounded-md bg-white">
+                        <button
+                          onClick={() => updateQuantity(product.id, quantity - 1)}
+                          className="p-1 hover:bg-stone-100 text-stone-600"
+                        >
+                          <Minus className="w-3.5 h-3.5" />
+                        </button>
+                        <span className="px-2 text-xs font-semibold text-stone-800">{quantity}</span>
+                        <button
+                          onClick={() => updateQuantity(product.id, quantity + 1)}
+                          className="p-1 hover:bg-stone-100 text-stone-600"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          {items.length > 0 && (
+            <div className="p-6 border-t border-stone-200 bg-white space-y-4">
+              <div className="flex justify-between items-center text-sm font-medium text-stone-600">
+                <span>Subtotal</span>
+                <span className="font-serif text-lg font-bold text-[#2E4A3E]">
+                  {formatGHS(subtotal)}
+                </span>
+              </div>
+              <p className="text-xs text-stone-400">
+                Shipping and taxes calculated during mobile money or card checkout.
+              </p>
+              <Link
+                href="/checkout"
+                onClick={closeCart}
+                className="w-full py-3.5 px-4 bg-[#2E4A3E] hover:bg-[#C86D51] text-white font-medium rounded-lg flex items-center justify-center gap-2 transition-colors shadow-md"
+              >
+                <span>Proceed to Checkout</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+`,
+
+  // 4. Product Card
+  "src/components/ui/ProductCard.tsx": `'use client';
+
+import React from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { ShoppingBag, Eye } from 'lucide-react';
+import { Product } from '@/lib/types';
+import { useCartStore } from '@/context/cart-store';
+import { formatGHS } from '@/lib/utils';
+
+interface ProductCardProps {
+  product: Product;
+}
+
+export default function ProductCard({ product }: ProductCardProps) {
+  const { addItem } = useCartStore();
+
+  const primaryImage =
+    product.image_urls?.[0] ||
+    'https://res.cloudinary.com/demo/image/upload/c_fill,w_600,h_600,q_auto,f_auto/sample.jpg';
+
+  return (
+    <div className="group relative bg-white rounded-xl overflow-hidden border border-stone-200/80 hover:border-[#2E4A3E]/30 transition-all duration-300 hover:shadow-lg flex flex-col justify-between">
+      <div>
+        <div className="relative aspect-square w-full bg-stone-100 overflow-hidden">
+          <Image
+            src={primaryImage}
+            alt={product.title}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+          />
+
+          <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
+            {product.is_featured && (
+              <span className="bg-[#2E4A3E] text-white text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-full shadow-xs">
+                Staff Pick
+              </span>
+            )}
+            {product.weight_grams && (
+              <span className="bg-white/90 backdrop-blur-xs text-stone-700 text-[11px] font-semibold px-2 py-0.5 rounded-md border border-stone-200">
+                {product.weight_grams}g
+              </span>
+            )}
+          </div>
+
+          <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+            <Link
+              href={\`/product/\${product.slug}\`}
+              className="p-3 bg-white text-stone-900 rounded-full hover:bg-[#2E4A3E] hover:text-white transition-colors shadow-lg"
+              title="View Botanical Specs"
+            >
+              <Eye className="w-5 h-5" />
+            </Link>
+            <button
+              onClick={() => addItem(product, 1)}
+              className="p-3 bg-[#C86D51] text-white rounded-full hover:bg-white hover:text-[#C86D51] transition-colors shadow-lg"
+              title="Quick Add to Bag"
+            >
+              <ShoppingBag className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
+        <div className="p-5">
+          {product.flavor_notes && product.flavor_notes.length > 0 && (
+            <div className="flex flex-wrap gap-1 mb-2">
+              {product.flavor_notes.slice(0, 2).map((note, idx) => (
+                <span
+                  key={idx}
+                  className="text-[10px] font-medium tracking-wide bg-[#2E4A3E]/5 text-[#2E4A3E] px-2 py-0.5 rounded-full"
+                >
+                  {note}
+                </span>
+              ))}
+            </div>
+          )}
+
+          <Link href={\`/product/\${product.slug}\`} className="block">
+            <h3 className="font-serif text-lg font-bold text-stone-900 group-hover:text-[#2E4A3E] transition-colors line-clamp-1">
+              {product.title}
+            </h3>
+          </Link>
+
+          <p className="text-xs text-stone-500 mt-1 line-clamp-2 leading-relaxed">
+            {product.tagline || product.description}
+          </p>
+        </div>
+      </div>
+
+      <div className="p-5 pt-0 flex items-center justify-between border-t border-stone-100 mt-2">
+        <div className="flex items-baseline gap-2">
+          <span className="font-serif text-lg font-bold text-[#2E4A3E]">
+            {formatGHS(product.price)}
+          </span>
+          {product.compare_at_price && product.compare_at_price > product.price && (
+            <span className="text-xs text-stone-400 line-through">
+              {formatGHS(product.compare_at_price)}
+            </span>
+          )}
+        </div>
+
+        <button
+          onClick={() => addItem(product, 1)}
+          className="text-xs font-semibold uppercase tracking-wider text-[#2E4A3E] hover:text-[#C86D51] transition-colors flex items-center gap-1"
+        >
+          <span>Add</span>
+          <span className="text-base">+</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+`,
+
+  // 5. Social Proof Notification
+  "src/components/realtime/SocialProof.tsx": `'use client';
+
+import { useEffect } from 'react';
+import { toast } from 'sonner';
+
+const SAMPLE_LOCATIONS = [
+  'East Legon',
+  'Airport Residential',
+  'Cantonments',
+  'Osu',
+  'Tema Community 6',
+  'Labone',
+  'Kumasi',
+];
+
+const SAMPLE_ITEMS = [
+  'Wild-Harvested Prekese Powder',
+  'Pure Cold-Pressed Rosemary Oil',
+  'Artisanal Jollof Seasoning Blend',
+  'Sun-Dried Hibiscus Flower Tea',
+  'Calabash Nutmeg Infusion',
+];
+
+export default function SocialProof() {
+  useEffect(() => {
+    const triggerSocialProof = () => {
+      const randomLoc = SAMPLE_LOCATIONS[Math.floor(Math.random() * SAMPLE_LOCATIONS.length)];
+      const randomItem = SAMPLE_ITEMS[Math.floor(Math.random() * SAMPLE_ITEMS.length)];
+
+      toast('🌿 Recent Order Placed', {
+        description: \`A customer in \${randomLoc} just purchased \${randomItem}.\`,
+        duration: 4000,
+      });
+    };
+
+    const initialTimer = setTimeout(triggerSocialProof, 10000);
+    const interval = setInterval(triggerSocialProof, 50000);
+
+    return () => {
+      clearTimeout(initialTimer);
+      clearInterval(interval);
+    };
+  }, []);
+
+  return null;
+}
+`,
+
+  // 6. Footer
+  "src/components/ui/Footer.tsx": `import React from 'react';
+import Link from 'next/link';
+import { Leaf, ShieldCheck, HeartHandshake, Phone, Mail, MapPin } from 'lucide-react';
+
+export default function Footer() {
+  return (
+    <footer className="bg-[#1C2822] text-[#FAF7F2] border-t border-stone-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-b border-white/10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+          <div className="flex flex-col md:flex-row items-center gap-4">
+            <div className="p-3 rounded-full bg-[#2E4A3E] text-[#E6C687]">
+              <Leaf className="w-6 h-6" />
+            </div>
+            <div>
+              <h4 className="font-serif font-semibold text-base">100% Raw &amp; Natural</h4>
+              <p className="text-stone-400 text-xs mt-1">Zero artificial additives, preservatives, or bulking agents.</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row items-center gap-4">
+            <div className="p-3 rounded-full bg-[#2E4A3E] text-[#E6C687]">
+              <HeartHandshake className="w-6 h-6" />
+            </div>
+            <div>
+              <h4 className="font-serif font-semibold text-base">Ethically Handcrafted</h4>
+              <p className="text-stone-400 text-xs mt-1">Supporting local Ghanaian women harvesters and smallholder farmers.</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row items-center gap-4">
+            <div className="p-3 rounded-full bg-[#2E4A3E] text-[#E6C687]">
+              <ShieldCheck className="w-6 h-6" />
+            </div>
+            <div>
+              <h4 className="font-serif font-semibold text-base">Accra &amp; Regional Delivery</h4>
+              <p className="text-stone-400 text-xs mt-1">Fast door-to-door dispatch with trusted courier handling.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 grid grid-cols-1 md:grid-cols-4 gap-12">
+        <div className="space-y-4">
+          <h3 className="font-serif text-2xl font-bold text-white tracking-tight">Plants &amp; Pure</h3>
+          <p className="text-stone-400 text-xs leading-relaxed">
+            Founded in 2020 in Accra, Ghana. We celebrate ancestral botanical traditions by offering unadulterated culinary spices, healing herbs, and therapeutic botanical oils.
+          </p>
+        </div>
+
+        <div>
+          <h4 className="font-serif text-sm font-semibold uppercase tracking-wider text-[#E6C687] mb-4">
+            Pantry Categories
+          </h4>
+          <ul className="space-y-2.5 text-xs text-stone-300">
+            <li><Link href="/shop?category=culinary-spices" className="hover:text-white transition-colors">Everyday Cooking Spices</Link></li>
+            <li><Link href="/shop?category=herbal-infusions" className="hover:text-white transition-colors">Medicinal Dried Herbs</Link></li>
+            <li><Link href="/shop?category=pure-botanical-oils" className="hover:text-white transition-colors">Pure Essential &amp; Food Oils</Link></li>
+            <li><Link href="/shop" className="hover:text-white transition-colors">Starter Gift Sets &amp; Bundles</Link></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 className="font-serif text-sm font-semibold uppercase tracking-wider text-[#E6C687] mb-4">
+            Direct Contact
+          </h4>
+          <ul className="space-y-2.5 text-xs text-stone-300">
+            <li className="flex items-center gap-2"><MapPin className="w-4 h-4 text-[#C86D51]" /> Accra, Ghana</li>
+            <li className="flex items-center gap-2"><Phone className="w-4 h-4 text-[#C86D51]" /> +233 (0) 50 000 0000</li>
+            <li className="flex items-center gap-2"><Mail className="w-4 h-4 text-[#C86D51]" /> orders@plantsandpure.com</li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 className="font-serif text-sm font-semibold uppercase tracking-wider text-[#E6C687] mb-4">
+            Purity Guarantee
+          </h4>
+          <p className="text-stone-400 text-xs leading-relaxed">
+            Every bottle is batched and inspected in Accra. No artificial colorings, MSG, or chemical extracts.
+          </p>
+        </div>
+      </div>
+
+      <div className="border-t border-white/5 py-6 text-center text-stone-500 text-xs">
+        © {new Date().getFullYear()} Plants &amp; Pure Limited. All Rights Reserved.
+      </div>
+    </footer>
+  );
+}
+`,
+
+  // 7. Homepage
+  "src/app/page.tsx": `'use client';
+
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { ArrowRight, Sparkles } from 'lucide-react';
+import Navbar from '@/components/ui/Navbar';
+import CartDrawer from '@/components/cart/CartDrawer';
+import ProductCard from '@/components/ui/ProductCard';
+import SocialProof from '@/components/realtime/SocialProof';
+import Footer from '@/components/ui/Footer';
+import { supabase } from '@/lib/supabase';
+import { Product } from '@/lib/types';
+
+export default function HomePage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchCatalog() {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (!error && data) {
+        setProducts(data as Product[]);
+      }
+      setLoading(false);
+    }
+
+    fetchCatalog();
+
+    const channel = supabase
+      .channel('public:products')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'products' },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            setProducts((prev) => [payload.new as Product, ...prev]);
+          } else if (payload.eventType === 'UPDATE') {
+            setProducts((prev) =>
+              prev.map((p) => (p.id === payload.new.id ? (payload.new as Product) : p))
+            );
+          } else if (payload.eventType === 'DELETE') {
+            setProducts((prev) => prev.filter((p) => p.id === payload.old.id));
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  return (
+    <div className="min-h-screen flex flex-col bg-[#FAF7F2]">
+      <Navbar />
+      <CartDrawer />
+      <SocialProof />
+
+      <section className="relative overflow-hidden pt-12 pb-20 md:py-28 bg-[#2E4A3E] text-[#FAF7F2]">
+        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#E6C687_1px,transparent_1px)] [background-size:16px_16px]" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <div className="space-y-6 text-center md:text-left">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md text-[#E6C687] text-xs font-semibold tracking-wider uppercase">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Handcrafted in Accra, Ghana</span>
+            </div>
+
+            <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
+              Purity you can taste. <br />
+              <span className="italic text-[#E6C687] font-normal">Botanicals that heal.</span>
+            </h1>
+
+            <p className="text-stone-300 text-base sm:text-lg max-w-xl leading-relaxed">
+              100% natural, additive-free culinary spices, sun-dried healing herbs, and cold-pressed botanical oils sourced directly from indigenous Ghanaian soil.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 pt-4">
+              <Link
+                href="/shop"
+                className="w-full sm:w-auto px-8 py-4 bg-[#C86D51] hover:bg-[#b05d43] text-white text-sm font-semibold rounded-lg shadow-lg flex items-center justify-center gap-2 transition-all hover:gap-3"
+              >
+                <span>Shop Botanical Pantry</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link
+                href="/shop?category=culinary-spices"
+                className="w-full sm:w-auto px-8 py-4 bg-transparent border border-white/30 hover:bg-white/10 text-white text-sm font-semibold rounded-lg transition-colors text-center"
+              >
+                Explore Spices
+              </Link>
+            </div>
+          </div>
+
+          <div className="relative aspect-4/3 rounded-2xl overflow-hidden shadow-2xl border-4 border-white/10 bg-stone-800">
+            <img
+              src="https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=1200&q=80"
+              alt="Artisanal Spices"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
+          <div>
+            <span className="text-xs uppercase tracking-[0.2em] font-bold text-[#C86D51]">
+              Farm-Fresh Harvest
+            </span>
+            <h2 className="font-serif text-3xl font-bold text-[#2E4A3E] mt-1">
+              Pure Pantry Essentials
+            </h2>
+          </div>
+          <Link
+            href="/shop"
+            className="mt-4 md:mt-0 text-sm font-semibold text-[#2E4A3E] hover:text-[#C86D51] flex items-center gap-1 transition-colors"
+          >
+            <span>View Full Pantry</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((n) => (
+              <div key={n} className="h-80 bg-stone-200 animate-pulse rounded-xl" />
+            ))}
+          </div>
+        ) : products.length === 0 ? (
+          <div className="text-center py-20 bg-white rounded-2xl border border-stone-200">
+            <h3 className="font-serif text-xl font-bold text-stone-800">Fresh Harvest Coming Soon</h3>
+            <p className="text-stone-500 text-sm mt-2">
+              Our botanical products are currently being batched.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {products.slice(0, 8).map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      <Footer />
+    </div>
+  );
+}
+`,
+
+  // 8. Shop Catalog
+  "src/app/shop/page.tsx": `'use client';
+
+import React, { useEffect, useState, useMemo } from 'react';
+import Navbar from '@/components/ui/Navbar';
+import CartDrawer from '@/components/cart/CartDrawer';
+import ProductCard from '@/components/ui/ProductCard';
+import Footer from '@/components/ui/Footer';
+import { supabase } from '@/lib/supabase';
+import { Product } from '@/lib/types';
+import { Search, SlidersHorizontal } from 'lucide-react';
+
+export default function ShopPage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<'featured' | 'price-low' | 'price-high'>('featured');
+
+  useEffect(() => {
+    async function loadProducts() {
+      const { data } = await supabase.from('products').select('*');
+      if (data) setProducts(data as Product[]);
+      setLoading(false);
+    }
+    loadProducts();
+
+    const channel = supabase
+      .channel('shop:products')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, (payload) => {
+        if (payload.eventType === 'INSERT') {
+          setProducts((prev) => [payload.new as Product, ...prev]);
+        } else if (payload.eventType === 'UPDATE') {
+          setProducts((prev) =>
+            prev.map((item) => (item.id === payload.new.id ? (payload.new as Product) : item))
+          );
+        } else if (payload.eventType === 'DELETE') {
+          setProducts((prev) => prev.filter((item) => item.id === payload.old.id));
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const filteredProducts = useMemo(() => {
+    return products
+      .filter((product) => {
+        const matchesSearch =
+          product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          product.description?.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesSearch;
+      })
+      .sort((a, b) => {
+        if (sortBy === 'price-low') return a.price - b.price;
+        if (sortBy === 'price-high') return b.price - a.price;
+        return 0;
+      });
+  }, [products, searchQuery, sortBy]);
+
+  return (
+    <div className="min-h-screen flex flex-col bg-[#FAF7F2]">
+      <Navbar />
+      <CartDrawer />
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-1 w-full">
+        <div className="border-b border-stone-200 pb-8 mb-8">
+          <h1 className="font-serif text-3xl sm:text-4xl font-bold text-[#2E4A3E]">
+            Artisanal Botanical Pantry
+          </h1>
+          <p className="text-stone-500 text-sm mt-2 max-w-2xl">
+            Pure single-origin spices, aromatic herbal infusions, and food-grade natural oils handcrafted in Ghana.
+          </p>
+        </div>
+
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
+          <div className="relative w-full md:w-96">
+            <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search spices, herbs, oils..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-stone-300 bg-white text-sm focus:outline-none focus:border-[#2E4A3E]"
+            />
+          </div>
+
+          <div className="flex items-center gap-3 w-full md:w-auto justify-end">
+            <span className="text-xs text-stone-500 font-medium flex items-center gap-1">
+              <SlidersHorizontal className="w-3.5 h-3.5" /> Sort:
+            </span>
+            <select
+              value={sortBy}
+              onChange={(e: any) => setSortBy(e.target.value)}
+              className="border border-stone-300 rounded-lg bg-white px-3 py-2 text-xs font-medium text-stone-700 focus:outline-none focus:border-[#2E4A3E]"
+            >
+              <option value="featured">Featured / Newest</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+            </select>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="h-80 bg-stone-200 rounded-xl animate-pulse" />
+            ))}
+          </div>
+        ) : filteredProducts.length === 0 ? (
+          <div className="text-center py-24 bg-white rounded-xl border border-stone-200">
+            <p className="text-stone-500 text-sm">No botanical products match your search criteria.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
+      </main>
+
+      <Footer />
+    </div>
+  );
+}
+`,
+
+  // 9. Product Details Page
+  "src/app/product/[slug]/page.tsx": `'use client';
+
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+import Image from 'next/image';
+import Navbar from '@/components/ui/Navbar';
+import CartDrawer from '@/components/cart/CartDrawer';
+import Footer from '@/components/ui/Footer';
+import { supabase } from '@/lib/supabase';
+import { Product } from '@/lib/types';
+import { useCartStore } from '@/context/cart-store';
+import { formatGHS } from '@/lib/utils';
+import { ShieldCheck, Leaf, Sparkles, Plus, Minus, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+
+export default function ProductDetailPage() {
+  const { slug } = useParams();
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [quantity, setQuantity] = useState(1);
+  const { addItem } = useCartStore();
+
+  useEffect(() => {
+    async function getProduct() {
+      if (!slug) return;
+      const { data } = await supabase.from('products').select('*').eq('slug', slug).single();
+      if (data) setProduct(data as Product);
+      setLoading(false);
+    }
+    getProduct();
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#FAF7F2] flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-[#2E4A3E] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-[#FAF7F2] flex flex-col items-center justify-center">
+        <h2 className="font-serif text-2xl font-bold text-stone-800">Product Not Found</h2>
+        <Link href="/shop" className="mt-4 text-sm text-[#2E4A3E] font-medium underline">
+          Return to catalog
+        </Link>
+      </div>
+    );
+  }
+
+  const primaryImage =
+    product.image_urls?.[0] ||
+    'https://res.cloudinary.com/demo/image/upload/c_fill,w_800,h_800,q_auto,f_auto/sample.jpg';
+
+  return (
+    <div className="min-h-screen flex flex-col bg-[#FAF7F2]">
+      <Navbar />
+      <CartDrawer />
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1 w-full">
+        <Link
+          href="/shop"
+          className="inline-flex items-center gap-2 text-xs font-semibold text-stone-500 hover:text-[#2E4A3E] mb-8 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" /> Back to Pantry
+        </Link>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+          <div className="space-y-4">
+            <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-white border border-stone-200 shadow-sm">
+              <Image
+                src={primaryImage}
+                alt={product.title}
+                fill
+                priority
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div>
+              <span className="text-xs uppercase tracking-widest font-bold text-[#C86D51]">
+                {product.weight_grams}g Net Weight
+              </span>
+              <h1 className="font-serif text-3xl sm:text-4xl font-bold text-[#2E4A3E] mt-1">
+                {product.title}
+              </h1>
+              <div className="mt-3 flex items-baseline gap-3">
+                <span className="font-serif text-3xl font-bold text-[#2E4A3E]">
+                  {formatGHS(product.price)}
+                </span>
+                {product.compare_at_price && (
+                  <span className="text-base text-stone-400 line-through">
+                    {formatGHS(product.compare_at_price)}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <p className="text-stone-600 text-sm leading-relaxed border-t border-b border-stone-200 py-4">
+              {product.description}
+            </p>
+
+            {product.flavor_notes && product.flavor_notes.length > 0 && (
+              <div>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-stone-700 mb-2">
+                  Sensory Notes
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {product.flavor_notes.map((note, i) => (
+                    <span
+                      key={i}
+                      className="px-3 py-1 bg-[#2E4A3E]/10 text-[#2E4A3E] text-xs font-medium rounded-md"
+                    >
+                      {note}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {product.culinary_uses && (
+              <div className="bg-stone-50 border border-stone-200/80 rounded-xl p-4">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#2E4A3E] flex items-center gap-1.5 mb-1">
+                  <Sparkles className="w-3.5 h-3.5 text-[#C86D51]" /> Culinary &amp; Wellness Guide
+                </h4>
+                <p className="text-xs text-stone-600 leading-relaxed">{product.culinary_uses}</p>
+              </div>
+            )}
+
+            <div className="space-y-4 pt-4">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center border border-stone-300 rounded-lg bg-white">
+                  <button
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="p-3 text-stone-500 hover:text-stone-900"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </button>
+                  <span className="px-4 font-semibold text-sm text-stone-800">{quantity}</span>
+                  <button
+                    onClick={() => setQuantity(quantity + 1)}
+                    className="p-3 text-stone-500 hover:text-stone-900"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <button
+                  onClick={() => addItem(product, quantity)}
+                  className="flex-1 py-4 px-6 bg-[#2E4A3E] hover:bg-[#C86D51] text-white font-semibold rounded-lg shadow-md transition-colors text-sm"
+                >
+                  Add to Botanical Bag • {formatGHS(product.price * quantity)}
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 pt-6 text-xs text-stone-500">
+              <div className="flex items-center gap-2">
+                <Leaf className="w-4 h-4 text-emerald-700" />
+                <span>100% Ghanaian Harvest</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-700" />
+                <span>Preservative &amp; MSG Free</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}
+`,
+
+  // 10. Checkout Page
+  "src/app/checkout/page.tsx": `'use client';
+
+import React, { useState } from 'react';
+import Script from 'next/script';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import confetti from 'canvas-confetti';
+import { useCartStore } from '@/context/cart-store';
+import { formatGHS, DELIVERY_ZONES } from '@/lib/utils';
+import { supabase } from '@/lib/supabase';
+import { ArrowLeft, CheckCircle, ShieldCheck } from 'lucide-react';
+
+declare global {
+  interface Window {
+    PaystackPop: any;
+  }
+}
+
+export default function CheckoutPage() {
+  const router = useRouter();
+  const { items, getSubtotal, clearCart } = useCartStore();
+
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [address, setAddress] = useState('');
+  const [deliveryArea, setDeliveryArea] = useState(Object.keys(DELIVERY_ZONES)[0]);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [orderComplete, setOrderComplete] = useState<string | null>(null);
+
+  const subtotal = getSubtotal();
+  const deliveryFee = DELIVERY_ZONES[deliveryArea] || 0;
+  const total = subtotal + deliveryFee;
+
+  const handlePaystackPayment = () => {
+    if (!name || !phone || !address) {
+      alert('Please fill in your name, delivery address, and active phone number.');
+      return;
+    }
+
+    setIsProcessing(true);
+
+    const handler = window.PaystackPop.setup({
+      key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || 'pk_test_xxxxxxxx',
+      email: email || \`\${phone}@plantsandpure.com\`,
+      amount: Math.round(total * 100),
+      currency: 'GHS',
+      channels: ['mobile_money', 'card'],
+      metadata: {
+        custom_fields: [
+          { display_name: 'Customer Name', variable_name: 'customer_name', value: name },
+          { display_name: 'Phone Number', variable_name: 'phone_number', value: phone },
+          { display_name: 'Delivery Zone', variable_name: 'delivery_zone', value: deliveryArea },
+        ],
+      },
+      callback: async function (response: { reference: string }) {
+        const { data: order, error } = await supabase
+          .from('orders')
+          .insert({
+            customer_name: name,
+            customer_phone: phone,
+            customer_email: email,
+            delivery_address: address,
+            delivery_area: deliveryArea,
+            delivery_fee: deliveryFee,
+            subtotal: subtotal,
+            total_amount: total,
+            paystack_reference: response.reference,
+            payment_status: 'paid',
+            fulfillment_status: 'unfulfilled',
+          })
+          .select()
+          .single();
+
+        if (!error && order) {
+          const orderItems = items.map((i) => ({
+            order_id: order.id,
+            product_id: i.product.id,
+            product_title: i.product.title,
+            quantity: i.quantity,
+            unit_price: i.product.price,
+            total_price: i.product.price * i.quantity,
+          }));
+
+          await supabase.from('order_items').insert(orderItems);
+
+          confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+          setOrderComplete(response.reference);
+          clearCart();
+        }
+        setIsProcessing(false);
+      },
+      onClose: function () {
+        setIsProcessing(false);
+      },
+    });
+
+    handler.openIframe();
+  };
+
+  if (orderComplete) {
+    return (
+      <div className="min-h-screen bg-[#FAF7F2] flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center border border-stone-200">
+          <CheckCircle className="w-16 h-16 text-emerald-600 mx-auto mb-4" />
+          <h2 className="font-serif text-2xl font-bold text-[#2E4A3E]">Order Confirmed!</h2>
+          <p className="text-xs text-stone-500 mt-1">Payment Reference: {orderComplete}</p>
+
+          <p className="text-stone-600 text-sm mt-4 leading-relaxed">
+            Thank you, <strong>{name}</strong>. Your artisanal order has been received and our team is preparing it for dispatch to <strong>{deliveryArea}</strong>.
+          </p>
+
+          <div className="mt-8 space-y-3">
+            <a
+              href={\`https://wa.me/233500000000?text=Hello%20Plants%26Pure,%20I%20just%20completed%20Order%20\${orderComplete}%20for%20\${name}\`}
+              target="_blank"
+              rel="noreferrer"
+              className="block w-full py-3 bg-[#2E4A3E] hover:bg-[#1C2822] text-white text-sm font-semibold rounded-lg transition-colors"
+            >
+              Track on WhatsApp
+            </a>
+            <Link
+              href="/"
+              className="block w-full py-3 bg-stone-100 hover:bg-stone-200 text-stone-700 text-sm font-semibold rounded-lg transition-colors"
+            >
+              Back to Home
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#FAF7F2]">
+      <Script src="https://js.paystack.co/v1/inline.js" strategy="lazyOnload" />
+
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <Link
+          href="/shop"
+          className="inline-flex items-center gap-2 text-xs font-semibold text-stone-500 hover:text-[#2E4A3E] mb-6"
+        >
+          <ArrowLeft className="w-4 h-4" /> Return to shopping
+        </Link>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="lg:col-span-7 bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
+            <h2 className="font-serif text-2xl font-bold text-[#2E4A3E]">Delivery Details</h2>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1.5">
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Abena Mensah"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-lg border border-stone-300 text-sm focus:outline-none focus:border-[#2E4A3E]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1.5">
+                  MoMo / WhatsApp Phone *
+                </label>
+                <input
+                  type="tel"
+                  required
+                  placeholder="024 XXX XXXX"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-lg border border-stone-300 text-sm focus:outline-none focus:border-[#2E4A3E]"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1.5">
+                Email Address (For receipt)
+              </label>
+              <input
+                type="email"
+                placeholder="customer@gmail.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-lg border border-stone-300 text-sm focus:outline-none focus:border-[#2E4A3E]"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1.5">
+                  Delivery Zone *
+                </label>
+                <select
+                  value={deliveryArea}
+                  onChange={(e) => setDeliveryArea(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-lg border border-stone-300 text-sm bg-white focus:outline-none focus:border-[#2E4A3E]"
+                >
+                  {Object.entries(DELIVERY_ZONES).map(([zone, fee]) => (
+                    <option key={zone} value={zone}>
+                      {zone} — {fee === 0 ? 'Free' : formatGHS(fee)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1.5">
+                  Specific Address / Landmark *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="House 4, Near Shell Station"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-lg border border-stone-300 text-sm focus:outline-none focus:border-[#2E4A3E]"
+                />
+              </div>
+            </div>
+
+            <div className="p-4 bg-[#2E4A3E]/5 rounded-xl border border-[#2E4A3E]/10 flex items-center gap-3">
+              <ShieldCheck className="w-5 h-5 text-emerald-700 shrink-0" />
+              <p className="text-xs text-stone-600">
+                Payment secured via Paystack. Supports MTN MoMo, Telecel Cash, and Bank Cards.
+              </p>
+            </div>
+          </div>
+
+          <div className="lg:col-span-5 bg-stone-50 p-8 rounded-2xl border border-stone-200 h-fit space-y-6">
+            <h3 className="font-serif text-lg font-bold text-[#2E4A3E]">Order Summary</h3>
+
+            <div className="divide-y divide-stone-200 max-h-60 overflow-y-auto pr-2">
+              {items.map((item) => (
+                <div key={item.product.id} className="py-3 flex justify-between text-xs">
+                  <div>
+                    <span className="font-semibold text-stone-800">{item.product.title}</span>
+                    <span className="text-stone-500 block">Qty: {item.quantity}</span>
+                  </div>
+                  <span className="font-semibold text-stone-800">
+                    {formatGHS(item.product.price * item.quantity)}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="border-t border-stone-200 pt-4 space-y-2 text-sm">
+              <div className="flex justify-between text-stone-600">
+                <span>Subtotal</span>
+                <span>{formatGHS(subtotal)}</span>
+              </div>
+              <div className="flex justify-between text-stone-600">
+                <span>Delivery Fee</span>
+                <span>{formatGHS(deliveryFee)}</span>
+              </div>
+              <div className="flex justify-between text-base font-bold text-[#2E4A3E] border-t border-stone-200 pt-2">
+                <span>Total Amount</span>
+                <span>{formatGHS(total)}</span>
+              </div>
+            </div>
+
+            <button
+              onClick={handlePaystackPayment}
+              disabled={isProcessing || items.length === 0}
+              className="w-full py-4 bg-[#2E4A3E] hover:bg-[#C86D51] text-white font-bold rounded-lg transition-colors text-sm shadow-md disabled:bg-stone-300"
+            >
+              {isProcessing ? 'Connecting Gateway...' : \`Pay \${formatGHS(total)} via MoMo / Card\`}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+`,
+};
+
+console.log("🌿 Unpacking Plants & Pure e-commerce files...");
+
+Object.entries(files).forEach(([filePath, content]) => {
+  const fullPath = path.join(__dirname, filePath);
+  fs.mkdirSync(path.dirname(fullPath), { recursive: true });
+  fs.writeFileSync(fullPath, content.trim() + "\n", "utf8");
+  console.log(` ✅ Created: ${filePath}`);
+});
+
+console.log(
+  "\n🎉 Done! All 10 files successfully generated in their exact directories.",
+);

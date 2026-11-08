@@ -1,0 +1,49 @@
+  const iconBtn = "relative grid size-11 place-items-center rounded-control text-text transition-colors hover:bg-background-alt";
+
+  return (
+    <>
+      <header className="sticky top-0 z-(--z-header) border-b border-border bg-background">
+        <div className="container-page flex h-(--header-h) items-center gap-2 md:gap-6">
+          <button type="button" className={cn(iconBtn, "-ml-2 md:hidden")} onClick={() => setMenuOpen(true)} aria-label="Open menu" aria-haspopup="dialog">
+            <Menu className={icon} strokeWidth={1.5} aria-hidden="true" />
+          </button>
+
+          <Link href="/" className="shrink-0 rounded-xs" aria-label="Plants & Pure — home">
+            <Wordmark />
+          </Link>
+
+          <nav aria-label="Primary" className="ml-4 hidden md:block">
+            <ul className="flex items-center gap-1">
+              {NAV.map((l) => {
+                const active = pathname === l.href || pathname.startsWith(`${l.href}/`);
+                return (
+                  <li key={l.href}>
+                    <Link
+                      href={l.href}
+                      aria-current={active ? "page" : undefined}
+                      className={cn("eyebrow inline-flex h-11 items-center rounded-control px-3 transition-colors hover:bg-background-alt", active && "underline decoration-2 underline-offset-8 decoration-accent")}
+                    >
+                      {l.label}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+
+          <div className="ml-auto flex items-center">
+            <button type="button" className={iconBtn} onClick={() => setSearchOpen(true)} aria-label="Search products" aria-haspopup="dialog">
+              <Search className={icon} strokeWidth={1.5} aria-hidden="true" />
+            </button>
+            <AccountMenu />
+            <button type="button" className={iconBtn} onClick={openCart} aria-label={`Open cart, ${count} ${count === 1 ? "item" : "items"}`} aria-haspopup="dialog">
+              <ShoppingBag className={icon} strokeWidth={1.5} aria-hidden="true" />
+              {count > 0 && (
+                <span aria-hidden="true" className={cn("numeral absolute right-0.5 top-0.5 grid min-w-5 place-items-center rounded-pill bg-accent px-1 text-caption font-bold leading-5 text-text", bump && "anim-bump")}>
+                  {count}
+                </span>
+              )}
+            </button>
+          </div>
+        </div>
+      </header>

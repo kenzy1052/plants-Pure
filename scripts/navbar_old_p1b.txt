@@ -1,0 +1,60 @@
+      {/* Mobile menu */}
+      <Drawer open={menuOpen} onClose={() => setMenuOpen(false)} title="Menu" side="left">
+        <nav aria-label="Mobile" className="flex-1 overflow-y-auto px-(--gutter) py-6">
+          <ul className="divide-y divide-border border-y border-border">
+            {NAV.map((l) => (
+              <li key={l.href}>
+                <Link href={l.href} className="flex min-h-14 items-center font-display text-h3">
+                  {l.label}
+                </Link>
+              </li>
+            ))}
+            <li>
+              <Link href="/account" className="flex min-h-14 items-center font-display text-h3">
+                Account
+              </Link>
+            </li>
+          </ul>
+          <div className="mt-8 space-y-1 text-small text-text-secondary">
+            <p className="eyebrow text-text-muted">Contact</p>
+            <p>
+              <a className="underline underline-offset-4" href={`tel:${CONTACT.primaryTel}`}>
+                {CONTACT.primaryPhone}
+              </a>
+            </p>
+            <p>
+              <a className="underline underline-offset-4" href={`mailto:${CONTACT.email}`}>
+                {CONTACT.email}
+              </a>
+            </p>
+            <p>{CONTACT.hours}</p>
+          </div>
+        </nav>
+      </Drawer>
+
+      {/* Search sheet: a normal GET form, so it works without JavaScript too */}
+      <Drawer open={searchOpen} onClose={() => setSearchOpen(false)} title="Search" side="top">
+        <form
+          role="search"
+          action="/shop"
+          method="get"
+          className="container-page flex w-full flex-col gap-3 py-6 sm:flex-row"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const q = String(new FormData(e.currentTarget).get("q") ?? "").trim();
+            setSearchOpen(false);
+            router.push(q ? `/shop?q=${encodeURIComponent(q)}` : "/shop");
+          }}
+        >
+          <label htmlFor="site-search" className="sr-only">
+            Search products
+          </label>
+          <Input id="site-search" ref={searchRef} name="q" type="search" placeholder="Search spices, herbs and oils" autoComplete="off" className="h-14 flex-1 text-body" maxLength={80} />
+          <button type="submit" className="inline-flex h-14 items-center justify-center rounded-control bg-action px-8 font-semibold text-text-inverse hover:bg-action-hover">
+            Search
+          </button>
+        </form>
+      </Drawer>
+    </>
+  );
+}
