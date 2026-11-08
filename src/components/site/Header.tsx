@@ -68,11 +68,11 @@ export function Header() {
 
   return (
     <>
-      <header className={cn("fixed inset-x-0 top-0 z-50 transition-shadow duration-300", scrolled && "shadow-soft")}>
+      <header className={cn("fixed inset-x-0 top-0 z-50 w-full max-w-full overflow-x-clip transition-shadow duration-300", scrolled && "shadow-soft")}>
         <div className={cn("relative border-b border-border backdrop-blur-xl transition-colors duration-500", scrolled ? "bg-background/85" : "bg-background")}>
           <nav
             aria-label="Main"
-            className="container-page relative flex h-[4.5rem] items-center justify-between gap-4"
+            className="container-page relative flex h-[4.5rem] min-w-0 items-center justify-between gap-2 sm:gap-4"
             style={{ "--g": "clamp(1rem, 0.4rem + 2.6vw, 3rem)" } as React.CSSProperties}
           >
             {/* Page title (product name) that takes over the left side of the bar once the page heading scrolls away */}
@@ -93,7 +93,7 @@ export function Header() {
             </div>
 
             <Link to="/" aria-label="Plants & Pure home" tabIndex={pageTitle ? -1 : 0} className={cn("shrink-0 transition-all duration-300 ease-[var(--ease-settle)]", pageTitle && "pointer-events-none -translate-y-3 opacity-0")}>
-              <Logo priority className="h-[3.1rem] transition-transform duration-500 ease-[var(--ease-settle)] hover:scale-105" />
+              <Logo priority className="h-11 sm:h-[3.1rem] transition-transform duration-500 ease-[var(--ease-settle)] hover:scale-105" />
             </Link>
 
             <ul className={cn("hidden items-center gap-8 transition-all duration-300 ease-[var(--ease-settle)] lg:flex", pageTitle && "pointer-events-none -translate-y-3 opacity-0")}>
@@ -147,7 +147,7 @@ export function Header() {
               </li>
             </ul>
 
-            <div className="flex items-center gap-0.5">
+            <div className="flex shrink-0 items-center gap-0.5">
               <IconButton label="Search products" onClick={() => setSearchOpen(true)}>
                 <Search className="h-[18px] w-[18px]" />
               </IconButton>

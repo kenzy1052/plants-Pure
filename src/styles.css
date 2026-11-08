@@ -227,6 +227,10 @@
     border-color: var(--color-border);
   }
   html {
+    /* Stop any wide child (hero parallax, off-screen animations) from widening the mobile layout viewport,
+       which is what made the fixed navbar look wider than the screen. `clip` keeps position:sticky working. */
+    overflow-x: clip;
+    max-width: 100%;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -236,7 +240,8 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     line-height: 1.6;
-    overflow-x: hidden;
+    overflow-x: clip;
+    max-width: 100%;
     transition: background-color 0.4s var(--ease-settle), color 0.4s var(--ease-settle);
   }
   h1, h2, h3, h4 {
