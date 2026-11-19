@@ -13,15 +13,70 @@ export const BUSINESS = {
   descriptor: "Quality spices, herbs and oils — healthy living on the go!",
   tagline: "Healthy living on the go",
   story: {
+    /** One-line origin, used in short intros. */
     origin:
-      "Plants & Pure Limited began in September 2020, born from a dream to offer wholesome, natural products that make life a bit more beautiful and healthy.",
-    belief:
-      "Our founder believed in the power of quality ingredients and genuine care in everything we make. That same love and dedication goes into every spice, herb and oil we produce, and it continues to guide how we grow, source, prepare, package and serve our customers.",
-    mission:
-      "To inspire and support women who want to create their own businesses with honesty and integrity, and to show that it is possible to succeed by keeping to high standards and delivering products that are good for the body and soul.",
-    vision:
-      "A world where everyone can live beautifully and healthily, surrounded by the natural goodness of quality spices, herbs and oils, with Plants & Pure as the first choice for products that bring nature's goodness into daily life.",
+      "Plants & Pure Limited began in 2020, born from a dream to offer wholesome, natural products that make life a bit more beautiful and healthy.",
+    /** Our Story — the three paragraphs shown on the About page. */
+    paragraphs: [
+      "Plants & Pure Limited began in 2020, born from a dream to offer wholesome, natural products that make life a bit more beautiful and healthy. Our founder, a passionate and driven woman, believed in the power of quality ingredients and genuine care in every product we make.",
+      "What started as a small operation in a home kitchen has now grown into a thriving business that serves customers nationwide. Throughout our growth, we've maintained our commitment to quality, sustainability, and empowering other women entrepreneurs.",
+      "Each spice, herb, and oil in our collection is carefully selected, ethically sourced, and packaged with love. We take pride in creating products that not only enhance your culinary adventures but also contribute to your overall wellbeing.",
+    ],
+    mission: [
+      "Our mission is simple: to inspire and support women who want to create their own businesses with honesty and integrity. We're here to show that it's possible to succeed by sticking to high standards and delivering products that are good for the soul and the body.",
+      "We believe in creating a business ecosystem that values people and planet alongside profit. Through our work, we aim to demonstrate that ethical business practices can lead to sustainable growth and meaningful impact.",
+    ],
+    vision: [
+      "We dream of a world where everyone can live beautifully and healthily, surrounded by the natural goodness of quality spices, herbs, and oils. At Plants & Pure, we strive to be your go-to for products that bring a touch of nature's beauty into your life.",
+      "Looking ahead, we envision a community of empowered women entrepreneurs, all supporting each other and creating businesses that make positive contributions to society. We aspire to be at the forefront of sustainable practices in our industry, setting new standards for quality and ethics.",
+    ],
   },
+  /** Our Journey: reworded milestones. The last entry is the open-ended "present" chapter. */
+  journey: [
+    {
+      year: "2020",
+      label: "2020",
+      title: "A dream begins",
+      body: "Plants & Pure started in a home kitchen, powered by a simple belief: honest, natural ingredients can make everyday life a little healthier and a lot more beautiful.",
+    },
+    {
+      year: "2021",
+      label: "2021",
+      title: "Growing together",
+      body: "Our shelf grew and so did our circle. We widened the range and began serving customers across several cities.",
+    },
+    {
+      year: "2022",
+      label: "2022",
+      title: "Reaching every doorstep",
+      body: "Nationwide delivery launched, carrying quality spices and herbs from our kitchen to homes across the country.",
+    },
+    {
+      year: "2023",
+      label: "2023",
+      title: "Lifting other women up",
+      body: "We started our women empowerment initiative, backing female entrepreneurs who are building their place in the industry.",
+    },
+    {
+      year: "2024",
+      label: "2024",
+      title: "Deeper, richer, still pure",
+      body: "Our collection expanded to include premium oils and wellness products, with the same quality promise on every label.",
+    },
+    {
+      year: "2026",
+      label: "2026 – Present",
+      title: "The next chapter",
+      body: "A fresh online home, a refined look and a fourth range, cereals, on the way. We keep growing, and we keep it pure.",
+    },
+  ],
+  /** The four ranges shown on the home page. dbSlug must match the categories table (null = not yet in the shop). */
+  ranges: [
+    { key: "spices", name: "Spices", description: "Warm, aromatic and carefully selected for everyday cooking.", dbSlug: "culinary-spices", status: "live" },
+    { key: "herbs", name: "Herbs", description: "Sun-kissed herbs packed to keep their natural character.", dbSlug: "herbal-infusions", status: "live" },
+    { key: "oils", name: "Natural Oils", description: "Pure, versatile oils for the kitchen and for skin care.", dbSlug: "pure-botanical-oils", status: "live" },
+    { key: "cereals", name: "Cereals", description: "Wholesome, nourishing grains for a good start to the day.", dbSlug: null, status: "soon" },
+  ],
   /** Core values — EATHI */
   values: [
     { letter: "E", name: "Excellence", body: "We set high standards in every product, process and service, and we keep improving them." },

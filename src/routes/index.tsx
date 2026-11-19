@@ -6,8 +6,11 @@ import { ImmersiveHero } from "@/components/site/ImmersiveHero";
 import { Reveal } from "@/components/site/Reveal";
 import { Parallax } from "@/components/site/Parallax";
 import { ProductCard } from "@/components/shop/ProductCard";
+import { RangeShowcase } from "@/components/site/RangeShowcase";
+import { JourneyTimeline } from "@/components/site/JourneyTimeline";
+import { Testimonials } from "@/components/site/Testimonials";
 import { Button } from "@/components/ui/button";
-import { categoriesQuery, productsQuery } from "@/lib/catalogue";
+import { productsQuery } from "@/lib/catalogue";
 import { BUSINESS, CONTACT } from "@/lib/business";
 import { PHOTO, STUDIO_RANGE } from "@/assets/company";
 import { cn } from "@/lib/utils";
@@ -43,12 +46,6 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-const RANGE_PHOTO: Record<string, { src: string; pos: string; alt: string }> = {
-  "culinary-spices": { src: PHOTO.flatlayChili, pos: "62% 50%", alt: "Plants & Pure spice pouches laid out with whole spices" },
-  "herbal-infusions": { src: PHOTO.rosemary, pos: "50% 40%", alt: "Plants & Pure rosemary powder in a studio shot" },
-  "pure-botanical-oils": { src: PHOTO.coconutOilJar, pos: "50% 45%", alt: "Plants & Pure virgin coconut oil in a studio shot" },
-};
-
 function SectionHead({ title, kicker, action }: { title: string; kicker?: string; action?: React.ReactNode }) {
   return (
     <div className="flex flex-wrap items-end justify-between gap-6">
@@ -64,7 +61,6 @@ function SectionHead({ title, kicker, action }: { title: string; kicker?: string
 function Home() {
   const [tab, setTab] = useState<string>("");
   const products = useQuery({ ...productsQuery({ pageSize: 8, category: tab || undefined }), placeholderData: (prev) => prev });
-  const categories = useQuery(categoriesQuery());
 
   return (
     <>
@@ -73,47 +69,16 @@ function Home() {
       {/* Shop by range */}
       <section className="container-page pt-10 sm:pt-16">
         <SectionHead
-          kicker="Three ranges"
-          title="Spices, herbs and oils, each prepared to our quality standards."
+          kicker="Shop by range"
+          title="Spices, herbs and oils, with cereals on the way."
           action={
             <Link to="/shop" className="type-small inline-flex items-center gap-1 font-semibold hover:text-brand">
               All products <ArrowRight className="h-4 w-4" />
             </Link>
           }
         />
-        <div className="mt-10 grid gap-4 md:grid-cols-3">
-          {BUSINESS.publishedCategories.map((c, i) => {
-            const live = categories.data?.find((x) => x.slug === c.dbSlug);
-            const photo = RANGE_PHOTO[c.dbSlug];
-            return (
-              <Reveal key={c.dbSlug} variant="scale" delay={i * 110}>
-                <Link
-                  to="/shop"
-                  search={{ category: c.dbSlug }}
-                  className="group relative block aspect-[4/5] overflow-hidden rounded-[1.75rem] bg-night text-night-foreground shadow-soft md:aspect-[3/4] lg:aspect-[4/5]"
-                >
-                  {photo && (
-                    <img
-                      src={photo.src}
-                      alt={photo.alt}
-                      loading="lazy"
-                      decoding="async"
-                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1400ms] ease-[var(--ease-settle)] group-hover:scale-[1.07]"
-                      style={{ objectPosition: photo.pos }}
-                    />
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-night/90 via-night/20 to-transparent" />
-                  <div className="absolute inset-x-0 bottom-0 p-6">
-                    <h3 className="font-display text-4xl tracking-tight">{c.name}</h3>
-                    <p className="type-small mt-2 max-w-[17rem] text-night-foreground/75">{c.description}</p>
-                    <span className="mt-5 inline-flex items-center gap-2 rounded-full bg-paper px-4 py-2 text-sm font-semibold text-ink transition-colors duration-300 group-hover:bg-brand-gradient group-hover:text-pepper-foreground">
-                      Shop {c.name.toLowerCase()} {live ? `(${live.productCount})` : ""} <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-                    </span>
-                  </div>
-                </Link>
-              </Reveal>
-            );
-          })}
+        <div className="mt-10">
+          <RangeShowcase />
         </div>
       </section>
 
@@ -285,7 +250,7 @@ function Home() {
               <p className="type-small font-semibold text-lime">Since {BUSINESS.foundedLabel}</p>
               <h2 className="type-section mt-2">A dream to make life a little more beautiful and healthy.</h2>
               <p className="type-body mt-5 max-w-lg text-pepper-foreground/85">{BUSINESS.story.origin}</p>
-              <p className="type-body mt-3 max-w-lg text-pepper-foreground/85">We also support and inspire women who want to start and grow their own businesses.</p>
+              <p className="type-body mt-3 max-w-lg text-pepper-foreground/85">{BUSINESS.story.paragraphs[1]}</p>
               <Button asChild variant="inverse" size="lg" className="mt-8">
                 <Link to="/about">
                   Read our story <ArrowRight />
@@ -295,6 +260,20 @@ function Home() {
           </div>
         </div>
       </section>
+
+      {/* Our journey */}
+      <section id="our-journey" className="container-page scroll-mt-28 pt-24 sm:pt-32">
+        <SectionHead kicker="Our journey so far" title="From a home kitchen to nationwide delivery." />
+        <Reveal as="p" delay={80} className="type-lead mt-4 max-w-2xl text-muted-foreground">
+          Here's how we've grown, while staying true to our values.
+        </Reveal>
+        <Reveal delay={120} className="mt-10">
+          <JourneyTimeline id="journey-home" />
+        </Reveal>
+      </section>
+
+      {/* Customer reviews: hidden until enough have been approved */}
+      <Testimonials />
 
       {/* Stockists */}
       <section id="stockists" className="container-page scroll-mt-28 pt-24 sm:pt-32">

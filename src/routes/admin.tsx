@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { z } from "zod";
-import { ArrowUpRight, Loader2, LayoutDashboard, Package, ShoppingBag, UserRound } from "lucide-react";
+import { ArrowUpRight, Loader2, LayoutDashboard, MessageSquareQuote, Package, ShoppingBag, UserRound, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
 import { isStaffRole, myProfileQuery } from "@/lib/profile";
@@ -11,10 +11,12 @@ import { OverviewPanel } from "@/components/admin/OverviewPanel";
 import { OrdersPanel } from "@/components/admin/OrdersPanel";
 import { ProductsPanel } from "@/components/admin/ProductsPanel";
 import { ProductEditor } from "@/components/admin/ProductEditor";
+import { ReviewsPanel } from "@/components/admin/ReviewsPanel";
+import { AudiencePanel } from "@/components/admin/AudiencePanel";
 
 export const Route = createFileRoute("/admin")({
   validateSearch: (s) =>
-    z.object({ tab: z.enum(["overview", "orders", "products"]).optional().catch(undefined), p: z.string().max(60).optional().catch(undefined) }).parse(s),
+    z.object({ tab: z.enum(["overview", "orders", "products", "reviews", "audience"]).optional().catch(undefined), p: z.string().max(60).optional().catch(undefined) }).parse(s),
   head: () => ({ meta: [{ title: "Admin | Plants & Pure" }, { name: "robots", content: "noindex, nofollow" }] }),
   component: Admin,
 });
@@ -49,6 +51,8 @@ function Admin() {
     { key: "overview", label: "Dashboard", icon: LayoutDashboard, show: true },
     { key: "orders", label: "Orders", icon: Package, show: true },
     { key: "products", label: "Products", icon: ShoppingBag, show: isAdmin },
+    { key: "reviews", label: "Reviews", icon: MessageSquareQuote, show: isAdmin },
+    { key: "audience", label: "Audience", icon: Users, show: isAdmin },
   ] as const;
 
   return (
@@ -73,6 +77,8 @@ function Admin() {
           {tab === "overview" && <OverviewPanel isAdmin={isAdmin} />}
           {tab === "orders" && <OrdersPanel />}
           {tab === "products" && (p ? <ProductEditor key={p} id={p} /> : <ProductsPanel />)}
+          {tab === "reviews" && <ReviewsPanel />}
+          {tab === "audience" && <AudiencePanel />}
         </section>
       </div>
     </div>

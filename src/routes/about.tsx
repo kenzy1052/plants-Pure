@@ -5,6 +5,8 @@ import { Parallax } from "@/components/site/Parallax";
 import { Button } from "@/components/ui/button";
 import { BUSINESS } from "@/lib/business";
 import { PHOTO } from "@/assets/company";
+import { JourneyTimeline } from "@/components/site/JourneyTimeline";
+import { Testimonials } from "@/components/site/Testimonials";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -71,17 +73,33 @@ function About() {
         </dl>
       </section>
 
+      {/* Our story */}
       <section className="container-page section-space">
         <div className="grid gap-12 lg:grid-cols-12">
           <Reveal className="lg:col-span-5">
-            <h2 className="type-section">Where we began</h2>
+            <p className="type-small font-semibold text-brand">Our story</p>
+            <h2 className="type-section mt-2">From a home kitchen to your table.</h2>
           </Reveal>
-          <div className="space-y-5 lg:col-span-7">
-            <Reveal>
-              <p className="type-lead">{BUSINESS.story.belief}</p>
-            </Reveal>
+          <div className="space-y-6 lg:col-span-7">
+            {BUSINESS.story.paragraphs.map((para, i) => (
+              <Reveal key={i} delay={i * 90}>
+                <p className={i === 0 ? "type-lead" : "type-body text-muted-foreground"}>{para}</p>
+              </Reveal>
+            ))}
           </div>
         </div>
+      </section>
+
+      {/* Our journey */}
+      <section className="container-page pb-4">
+        <Reveal>
+          <p className="type-small font-semibold text-brand">Our journey so far</p>
+          <h2 className="type-section mt-2 max-w-2xl">From a home kitchen to nationwide delivery.</h2>
+          <p className="type-lead mt-4 max-w-2xl text-muted-foreground">Here's how we've grown, while staying true to our values.</p>
+        </Reveal>
+        <Reveal delay={100} className="mt-10">
+          <JourneyTimeline id="journey" />
+        </Reveal>
       </section>
 
       {/* Mission & vision */}
@@ -89,11 +107,13 @@ function About() {
         <div className="grid lg:grid-cols-2">
           <Reveal variant="left" className="bg-brand-gradient p-8 text-pepper-foreground sm:p-14 lg:px-[max(3rem,calc((100vw-88rem)/2+1.5rem))] lg:pr-14">
             <p className="type-small font-semibold text-lime">Our mission</p>
-            <p className="type-sub mt-5 leading-snug">{BUSINESS.story.mission}</p>
+            <p className="type-sub mt-5 leading-snug">{BUSINESS.story.mission[0]}</p>
+            <p className="type-body mt-5 text-pepper-foreground/85">{BUSINESS.story.mission[1]}</p>
           </Reveal>
           <Reveal variant="right" className="stage grain relative overflow-hidden p-8 text-night-foreground sm:p-14 lg:pl-14 lg:pr-[max(3rem,calc((100vw-88rem)/2+1.5rem))]">
             <p className="type-small font-semibold text-lime">Our vision</p>
-            <p className="type-sub mt-5 leading-snug">{BUSINESS.story.vision}</p>
+            <p className="type-sub mt-5 leading-snug">{BUSINESS.story.vision[0]}</p>
+            <p className="type-body mt-5 text-night-foreground/75">{BUSINESS.story.vision[1]}</p>
           </Reveal>
         </div>
       </section>
@@ -167,7 +187,9 @@ function About() {
         </div>
       </section>
 
-      <section className="container-page pb-8 text-center sm:pb-12">
+      <Testimonials />
+
+      <section className="container-page pt-24 pb-8 text-center sm:pb-12">
         <Reveal>
           <h2 className="type-section mx-auto max-w-2xl">Healthy living on the go.</h2>
           <div className="mt-8 flex flex-wrap justify-center gap-3">

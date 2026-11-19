@@ -5,6 +5,7 @@ import { z } from "zod";
 import { Check, Loader2, PackageSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ReceivedButton } from "@/components/shop/ReceivedButton";
+import { ReviewForm } from "@/components/shop/ReviewForm";
 import { trackOrder } from "@/lib/checkout.functions";
 import { FULFILMENT_STEPS, parseTrackingCode } from "@/lib/tracking";
 import { formatGHS } from "@/lib/money";
@@ -149,6 +150,8 @@ function Track() {
                   <ReceivedButton code={order.code} pickup={order.isPickup} onDone={() => setOrder((o) => (o ? { ...o, fulfillmentStatus: "delivered" } : o))} />
                 </div>
               )}
+
+              {order.paymentStatus === "paid" && order.fulfillmentStatus === "delivered" && <ReviewForm code={order.code} delivered />}
 
               <ul className="mt-8 divide-y divide-border border-t border-border">
                 {order.items.map((i, idx) => (

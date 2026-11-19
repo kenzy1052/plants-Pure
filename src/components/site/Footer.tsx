@@ -1,5 +1,11 @@
 import { Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { Facebook, Instagram } from "lucide-react";
+import { BUSINESS, CONTACT } from "@/lib/business";
+import { testimonialsQuery, testimonialsVisible } from "@/lib/testimonials";
+import { Logo } from "./Logo";
+import { SubscribeForm } from "./SubscribeForm";
+import "./growth.css";
 
 function LinkedinIcon({ className }: { className?: string }) {
   return (
@@ -16,28 +22,47 @@ function TiktokIcon({ className }: { className?: string }) {
     </svg>
   );
 }
-import { BUSINESS, CONTACT } from "@/lib/business";
-import { Logo } from "./Logo";
+
+/** Wording is warm and specific: belonging ("join"), reciprocity ("we share"), and a clear, honest ask ("like", "follow"). */
+const SOCIALS = [
+  { href: CONTACT.tiktok, label: "TikTok", handle: CONTACT.tiktokHandle, line: "Watch and like our quick recipe videos. Every like helps a women-led brand reach more kitchens.", icon: <TiktokIcon className="h-4 w-4" /> },
+  { href: CONTACT.instagram, label: "Instagram", handle: CONTACT.instagramHandle, line: "Follow for recipes, behind-the-scenes and the first look at new products.", icon: <Instagram className="h-4 w-4" /> },
+  { href: CONTACT.facebook, label: "Facebook", handle: "Plants & Pure", line: "Join the conversation. Swap ideas, ask questions and catch our offers first.", icon: <Facebook className="h-4 w-4" /> },
+  { href: CONTACT.linkedin, label: "LinkedIn", handle: "Plants & Pure Limited", line: "Follow our journey and the women entrepreneurs growing with us.", icon: <LinkedinIcon className="h-4 w-4" /> },
+] as const;
 
 export function Footer() {
+  const reviews = useQuery(testimonialsQuery());
+  const showReviews = testimonialsVisible(reviews.data);
+
   return (
     <footer className="mt-24 bg-night text-night-foreground">
+      {/* Join the circle */}
+      <div id="subscribe" className="container-page scroll-mt-28 pt-14">
+        <div className="subscribe-card grid items-center gap-8 lg:grid-cols-12">
+          <div className="lg:col-span-6">
+            <p className="type-label text-lime">Join the Plants &amp; Pure circle</p>
+            <h2 className="type-section mt-3 text-white">Be the first to know.</h2>
+            <p className="type-body mt-3 max-w-md text-white/85">Fresh batches, new ranges (cereals are coming!), kitchen tips and members-only offers, sent to your inbox only when it's worth your time.</p>
+          </div>
+          <div className="lg:col-span-6">
+            <SubscribeForm />
+            <p className="type-small mt-3 text-white/75">No spam, ever. Unsubscribe with one click.</p>
+          </div>
+        </div>
+      </div>
+
       <div className="container-page grid gap-12 py-14 sm:grid-cols-2 lg:grid-cols-12">
         <div className="lg:col-span-4">
           <Logo className="h-24" />
           <p className="type-small mt-4 max-w-xs text-night-muted">{BUSINESS.descriptor}</p>
-          <div className="mt-6 flex gap-2">
-            {[
-              { href: CONTACT.instagram, label: "Instagram", icon: <Instagram className="h-4 w-4" /> },
-              { href: CONTACT.facebook, label: "Facebook", icon: <Facebook className="h-4 w-4" /> },
-              { href: CONTACT.linkedin, label: "LinkedIn", icon: <LinkedinIcon className="h-4 w-4" /> },
-              { href: CONTACT.tiktok, label: `TikTok (${CONTACT.tiktokHandle})`, icon: <TiktokIcon className="h-4 w-4" /> },
-            ].map((x) => (
-              <a key={x.label} href={x.href} target="_blank" rel="noreferrer" aria-label={x.label} className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-night-foreground/10 transition-colors hover:bg-brand-gradient hover:text-pepper-foreground">
-                {x.icon}
-              </a>
+          <ul className="type-small mt-6 space-y-2.5 text-night-foreground/90">
+            <li>{CONTACT.location} · {CONTACT.hours}</li>
+            <li><a href={`mailto:${CONTACT.email}`} className="link-line">{CONTACT.email}</a></li>
+            {CONTACT.phones.map((p) => (
+              <li key={p.tel}><a href={`tel:${p.tel}`} className="link-line">{p.label}</a></li>
             ))}
-          </div>
+          </ul>
         </div>
 
         <nav aria-label="Shop" className="lg:col-span-2">
@@ -57,17 +82,25 @@ export function Footer() {
             <li><Link to="/account" className="link-line">My account</Link></li>
             <li><Link to="/contact" className="link-line">Contact us</Link></li>
             <li><Link to="/about" className="link-line">Our story</Link></li>
+            {showReviews && <li><Link to="/testimonials" className="link-line">Customer reviews</Link></li>}
             <li><Link to="/" hash="stockists" className="link-line">Find us in store</Link></li>
           </ul>
         </nav>
 
         <div className="lg:col-span-4">
-          <p className="type-label text-lime">Get in touch</p>
-          <ul className="type-small mt-4 space-y-2.5 text-night-foreground/90">
-            <li>{CONTACT.location} · {CONTACT.hours}</li>
-            <li><a href={`mailto:${CONTACT.email}`} className="link-line">{CONTACT.email}</a></li>
-            {CONTACT.phones.map((p) => (
-              <li key={p.tel}><a href={`tel:${p.tel}`} className="link-line">{p.label}</a></li>
+          <p className="type-label text-lime">Follow the story</p>
+          <p className="type-small mt-3 text-night-muted">Be part of our growing family, and help a woman-led business grow.</p>
+          <ul className="mt-4 grid gap-2.5">
+            {SOCIALS.map((s) => (
+              <li key={s.label}>
+                <a href={s.href} target="_blank" rel="noreferrer noopener" className="social-link" aria-label={`${s.label}: ${s.handle}`}>
+                  <span className="social-icon">{s.icon}</span>
+                  <span className="min-w-0">
+                    <span className="type-small block font-semibold">{s.label} <span className="font-normal text-night-muted">· {s.handle}</span></span>
+                    <span className="block text-[0.78rem] leading-snug text-night-muted">{s.line}</span>
+                  </span>
+                </a>
+              </li>
             ))}
           </ul>
         </div>
