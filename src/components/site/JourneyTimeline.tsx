@@ -3,8 +3,10 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { BUSINESS } from "@/lib/business";
 import "./growth.css";
 
-/** Seconds each chapter stays in focus before the timeline glides to the next one. */
-const INTERVAL_S = 7;
+/** How long each chapter stays lit before the flame sets off for the next one (ms). */
+const DWELL_MS = 4800;
+/** Travel time for one hop along the line (seconds); extra hops add a little more. */
+const hopSeconds = (hops: number) => Math.min(2.8, 1.3 + (hops - 1) * 0.45);
 
 function Odometer({ year }: { year: string }) {
   return (
@@ -23,19 +25,22 @@ function Odometer({ year }: { year: string }) {
 }
 
 /**
- * "Our journey so far": a kinetic timeline. The line fills to the chapter in focus, the node glows,
- * the year rolls like an odometer and the copy glides across. It advances by itself while on screen,
- * pauses on hover/focus/touch, and can be driven with the dots, arrows, swipes or the keyboard.
+ * "Our journey so far". The first year glows; a flame then races along the line to the next year, the node
+ * pops when it arrives, the year rolls over and the story slides in. Then it carries on, in order.
+ * It runs by itself while on screen, pauses on hover/focus, and can be driven by tapping a year, the arrows,
+ * swiping or the keyboard.
  */
 export function JourneyTimeline({ id = "journey" }: { id?: string }) {
   const items = BUSINESS.journey;
   const last = items.length - 1;
   const [active, setActive] = useState(0);
+  const [travel, setTravel] = useState<{ to: number; dur: number } | null>(null);
   const [inView, setInView] = useState(false);
   const [paused, setPaused] = useState(false);
   const [reduced, setReduced] = useState(true); // assume reduced until the client says otherwise (no SSR flash)
   const rootRef = useRef<HTMLElement>(null);
   const touchX = useRef<number | null>(null);
+  const arrive = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -53,25 +58,58 @@ export function JourneyTimeline({ id = "journey" }: { id?: string }) {
     return () => io.disconnect();
   }, []);
 
-  const go = useCallback((i: number) => setActive(Math.max(0, Math.min(last, i))), [last]);
-  const auto = inView && !reduced;
+  useEffect(() => () => { if (arrive.current) clearTimeout(arrive.current); }, []);
+
+  /** Send the flame to a chapter; the node only takes focus once the flame has arrived. */
+  const goTo = useCallback(
+    (to: number, forceDur?: number) => {
+      const target = Math.max(0, Math.min(last, to));
+      if (arrive.current) clearTimeout(arrive.current);
+      if (target === active && !travel) return;
+      const from = travel ? travel.to : active;
+      if (target === from && travel) return;
+      const hops = Math.abs(target - active);
+      if (reduced || hops === 0) {
+        setTravel(null);
+        setActive(target);
+        return;
+      }
+      const dur = forceDur ?? hopSeconds(hops);
+      setTravel({ to: target, dur });
+      arrive.current = setTimeout(() => {
+        setActive(target);
+        setTravel(null);
+      }, dur * 1000 + 40);
+    },
+    [active, travel, last, reduced],
+  );
+
+  // Autoplay: dwell on the lit chapter, then send the flame onwards (and back to the start after the last one).
+  useEffect(() => {
+    if (!inView || paused || reduced || travel) return;
+    const t = setTimeout(() => goTo(active >= last ? 0 : active + 1, active >= last ? 1.8 : undefined), DWELL_MS);
+    return () => clearTimeout(t);
+  }, [inView, paused, reduced, travel, active, last, goTo]);
 
   const onKey = (e: KeyboardEvent) => {
-    if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); go(active + 1); }
-    else if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); go(active - 1); }
-    else if (e.key === "Home") { e.preventDefault(); go(0); }
-    else if (e.key === "End") { e.preventDefault(); go(last); }
+    const at = travel ? travel.to : active;
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); goTo(at + 1); }
+    else if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); goTo(at - 1); }
+    else if (e.key === "Home") { e.preventDefault(); goTo(0); }
+    else if (e.key === "End") { e.preventDefault(); goTo(last); }
   };
   const onPointerDown = (e: PointerEvent) => { touchX.current = e.clientX; };
   const onPointerUp = (e: PointerEvent) => {
     if (touchX.current == null) return;
     const dx = e.clientX - touchX.current;
     touchX.current = null;
-    if (Math.abs(dx) > 48) go(active + (dx < 0 ? 1 : -1));
+    if (Math.abs(dx) > 48) goTo((travel ? travel.to : active) + (dx < 0 ? 1 : -1));
   };
 
-  const p = last === 0 ? 0 : active / last;
+  const shown = travel ? travel.to : active;
+  const p = last === 0 ? 0 : shown / last;
   const current = items[active]!;
+  const forward = travel && travel.to > active;
 
   return (
     <section
@@ -79,49 +117,54 @@ export function JourneyTimeline({ id = "journey" }: { id?: string }) {
       id={id}
       aria-label="Our journey so far"
       className="journey scroll-mt-28"
-      data-auto={auto}
-      style={{ "--p": p, "--journey-interval": `${INTERVAL_S}s`, "--journey-play": paused ? "paused" : "running" } as CSSProperties}
+      data-travel={Boolean(travel)}
+      style={{ "--p": p, "--travel-dur": `${travel?.dur ?? 0}s` } as CSSProperties}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
     >
       <span className="journey-orb" data-k="red" aria-hidden />
-      <span className="journey-orb" data-k="lime" aria-hidden />
+      <span className="journey-orb" data-k="amber" aria-hidden />
 
       <div role="tablist" aria-label="Milestones" className="journey-track" onKeyDown={onKey}>
         <span className="journey-line" aria-hidden />
         <span className="journey-fill" aria-hidden />
-        {items.map((it, i) => (
-          <button
-            key={it.year}
-            type="button"
-            role="tab"
-            id={`${id}-tab-${i}`}
-            aria-selected={i === active}
-            aria-controls={`${id}-panel-${i}`}
-            tabIndex={i === active ? 0 : -1}
-            data-done={i < active}
-            className="journey-node"
-            style={{ "--at": last === 0 ? 0 : i / last } as CSSProperties}
-            onClick={() => go(i)}
-            // the CSS progress ring finishing is what advances the story (so pausing the ring pauses the story)
-            onAnimationEnd={(e) => {
-              if (e.animationName === "journey-progress" && i === active) setActive((a) => (a >= last ? 0 : a + 1));
-            }}
-          >
-            <span className="journey-dot">
-              <svg className="journey-ring" viewBox="0 0 36 36" aria-hidden>
-                <circle className="bg" cx="18" cy="18" r="16" />
-                <circle className="fg" cx="18" cy="18" r="16" pathLength={100.5} key={`${active}-${i}`} />
-              </svg>
-            </span>
-            <span className="journey-year">
-              <span className="sm:hidden">’{it.year.slice(2)}</span>
-              <span className="hidden sm:inline">{it.year}</span>
-            </span>
-          </button>
-        ))}
+        <span className="journey-head" aria-hidden>
+          <span className="journey-tail" />
+          <span className="journey-core" />
+          <span className="journey-ember" />
+          <span className="journey-ember" />
+          <span className="journey-ember" />
+        </span>
+        {items.map((it, i) => {
+          const passing = Boolean(forward && travel && i > active && i < travel.to);
+          const retreating = Boolean(travel && travel.to < active && i > travel.to && i <= active);
+          const lit = retreating ? false : i <= active || passing;
+          const delay = passing && travel ? ((i - active) / (travel.to - active)) * travel.dur : retreating && travel ? ((active - i) / (active - travel.to)) * travel.dur : 0;
+          return (
+            <button
+              key={it.year}
+              type="button"
+              role="tab"
+              id={`${id}-tab-${i}`}
+              aria-selected={i === active}
+              aria-controls={`${id}-panel-${i}`}
+              tabIndex={i === active ? 0 : -1}
+              data-lit={lit}
+              data-pass={passing}
+              className="journey-node"
+              style={{ "--at": last === 0 ? 0 : i / last, "--lit-delay": `${delay.toFixed(2)}s` } as CSSProperties}
+              onClick={() => goTo(i)}
+            >
+              <span className="journey-dot" />
+              <span className="journey-year">
+                <span className="sm:hidden">’{it.year.slice(2)}</span>
+                <span className="hidden sm:inline">{it.year}</span>
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       <div className="journey-stage" onPointerDown={onPointerDown} onPointerUp={onPointerUp} style={{ touchAction: "pan-y" }}>
@@ -141,28 +184,20 @@ export function JourneyTimeline({ id = "journey" }: { id?: string }) {
               data-state={i === active ? "active" : i < active ? "before" : "after"}
               className="journey-slide"
             >
-              <p className="type-small font-semibold uppercase tracking-[0.16em] text-lime">
-                {String(i + 1).padStart(2, "0")} <span className="text-night-muted">/ {String(items.length).padStart(2, "0")}</span>
-                <span className="mx-2 text-night-muted">·</span>
-                {it.label}
-              </p>
-              <h3 className="type-section mt-3 text-night-foreground">{it.title}</h3>
+              <h3 className="type-section text-night-foreground">{it.title}</h3>
               <p className="type-lead mt-4 max-w-lg text-night-foreground/75">{it.body}</p>
             </article>
           ))}
         </div>
       </div>
 
-      <div className="mt-8 flex items-center justify-between gap-4">
-        <p className="type-small text-night-muted">{auto && !paused ? "Moving through our story…" : "Tap a year to jump ahead."}</p>
-        <div className="flex gap-2">
-          <button type="button" className="journey-ctrl" aria-label="Previous milestone" disabled={active === 0} onClick={() => go(active - 1)}>
-            <ArrowLeft className="h-4 w-4" />
-          </button>
-          <button type="button" className="journey-ctrl" aria-label="Next milestone" disabled={active === last} onClick={() => go(active + 1)}>
-            <ArrowRight className="h-4 w-4" />
-          </button>
-        </div>
+      <div className="mt-8 flex items-center justify-end gap-2">
+        <button type="button" className="journey-ctrl" aria-label="Previous milestone" disabled={active === 0} onClick={() => goTo(shown - 1)}>
+          <ArrowLeft className="h-4 w-4" />
+        </button>
+        <button type="button" className="journey-ctrl" aria-label="Next milestone" disabled={active === last} onClick={() => goTo(shown + 1)}>
+          <ArrowRight className="h-4 w-4" />
+        </button>
       </div>
     </section>
   );

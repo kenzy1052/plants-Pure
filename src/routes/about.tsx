@@ -83,7 +83,7 @@ function About() {
           <div className="space-y-6 lg:col-span-7">
             {BUSINESS.story.paragraphs.map((para, i) => (
               <Reveal key={i} delay={i * 90}>
-                <p className={i === 0 ? "type-lead" : "type-body text-muted-foreground"}>{para}</p>
+                <p className="type-lead text-foreground/85">{para}</p>
               </Reveal>
             ))}
           </div>
@@ -107,13 +107,13 @@ function About() {
         <div className="grid lg:grid-cols-2">
           <Reveal variant="left" className="bg-brand-gradient p-8 text-pepper-foreground sm:p-14 lg:px-[max(3rem,calc((100vw-88rem)/2+1.5rem))] lg:pr-14">
             <p className="type-small font-semibold text-lime">Our mission</p>
-            <p className="type-sub mt-5 leading-snug">{BUSINESS.story.mission[0]}</p>
-            <p className="type-body mt-5 text-pepper-foreground/85">{BUSINESS.story.mission[1]}</p>
+            <p className="type-lead mt-5 text-pepper-foreground/95">{BUSINESS.story.mission[0]}</p>
+            <p className="type-lead mt-5 text-pepper-foreground/95">{BUSINESS.story.mission[1]}</p>
           </Reveal>
           <Reveal variant="right" className="stage grain relative overflow-hidden p-8 text-night-foreground sm:p-14 lg:pl-14 lg:pr-[max(3rem,calc((100vw-88rem)/2+1.5rem))]">
             <p className="type-small font-semibold text-lime">Our vision</p>
-            <p className="type-sub mt-5 leading-snug">{BUSINESS.story.vision[0]}</p>
-            <p className="type-body mt-5 text-night-foreground/75">{BUSINESS.story.vision[1]}</p>
+            <p className="type-lead mt-5 text-night-foreground/90">{BUSINESS.story.vision[0]}</p>
+            <p className="type-lead mt-5 text-night-foreground/90">{BUSINESS.story.vision[1]}</p>
           </Reveal>
         </div>
       </section>

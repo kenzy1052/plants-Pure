@@ -109,6 +109,9 @@ export function ImmersiveHero() {
 
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const mobileQuery = window.matchMedia("(max-width: 700px)");
+    // The scroll film only plays on laptops and larger screens. Phones and tablets get the finished hero straight away.
+    const filmQuery = window.matchMedia("(min-width: 1024px)");
+    const still = () => reduceMotion.matches || !filmQuery.matches;
     const nodes = Array.from(track.querySelectorAll<HTMLElement>("[data-product-index]"));
     const finalCopy = track.querySelector<HTMLElement>(".pp-hero-final-copy");
     const openingFoot = track.querySelector<HTMLElement>(".pp-hero-opening-foot");
@@ -150,10 +153,11 @@ export function ImmersiveHero() {
       const rect = track.getBoundingClientRect();
       const pinHeight = pin.getBoundingClientRect().height || window.innerHeight;
       const maxProgress = Math.max(1, track.offsetHeight - pinHeight);
-      const progress = reduceMotion.matches ? 1 : clamp(-rect.top / maxProgress);
+      const progress = still() ? 1 : clamp(-rect.top / maxProgress);
       const isOverHero = rect.top <= window.innerHeight && rect.bottom > 0;
       document.body.classList.toggle("pp-hero-header-dark", isOverHero);
       track.dataset.reduced = String(reduceMotion.matches);
+      track.dataset.still = String(still());
 
       // Opening copy leaves first
       const set = (name: string, value: string) => track.style.setProperty(name, value);
@@ -179,10 +183,10 @@ export function ImmersiveHero() {
       set("--pp-bottle-reflect", (0.22 * (1 - smoothstep(0.1, 0.4, progress))).toFixed(3));
       set("--pp-contact", smoothstep(0.7, 0.86, progress).toFixed(3));
 
-      const copyVisible = reduceMotion.matches || progress >= REVEAL[0][0];
+      const copyVisible = still() || progress >= REVEAL[0][0];
       finalCopy?.setAttribute("aria-hidden", String(!copyVisible));
       finalCopy?.toggleAttribute("inert", !copyVisible);
-      openingFoot?.toggleAttribute("inert", reduceMotion.matches || progress >= 0.3);
+      openingFoot?.toggleAttribute("inert", still() || progress >= 0.3);
 
       // Products: travel + scale + 3D turn (move), then lower onto the stand (settle)
       const move = smootherstep(0.14, 0.62, progress);
@@ -232,11 +236,13 @@ export function ImmersiveHero() {
     window.addEventListener("scroll", requestRender, { passive: true });
     window.addEventListener("resize", onResize, { passive: true });
     reduceMotion.addEventListener("change", requestRender);
+    filmQuery.addEventListener("change", onResize);
 
     return () => {
       window.removeEventListener("scroll", requestRender);
       window.removeEventListener("resize", onResize);
       reduceMotion.removeEventListener("change", requestRender);
+      filmQuery.removeEventListener("change", onResize);
       if (raf) window.cancelAnimationFrame(raf);
       document.body.classList.remove("pp-hero-header-dark");
     };

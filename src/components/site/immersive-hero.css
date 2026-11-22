@@ -552,3 +552,29 @@ body.pp-hero-header-dark header :is(a, button):hover {
     transition: none !important;
   }
 }
+/*
+ * Phones and tablets (under 1024px): no scroll film. The hero is one screen showing the finished composition,
+ * and every animated variable starts at its final value so there is no flash of the opening frame before the script runs.
+ */
+@media (max-width: 1023.98px) {
+  .pp-hero-track {
+    height: auto;
+    --pp-progress: 1;
+    --pp-kicker-opacity: 0;
+    --pp-intro-title-opacity: 0;
+    --pp-intro-foot-opacity: 0;
+    --pp-r0: 1;
+    --pp-r1: 1;
+    --pp-r2: 1;
+    --pp-r3: 1;
+    --pp-d-left: 0px;
+    --pp-d-center: 0px;
+    --pp-d-right: 0px;
+    --pp-stand-reflect: 1;
+    --pp-bottle-reflect: 0;
+    --pp-contact: 1;
+  }
+  .pp-hero-pin {
+    position: relative;
+  }
+}

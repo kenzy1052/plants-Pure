@@ -1,19 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
 import { ArrowRight, MapPin } from "lucide-react";
 import { ImmersiveHero } from "@/components/site/ImmersiveHero";
 import { Reveal } from "@/components/site/Reveal";
 import { Parallax } from "@/components/site/Parallax";
-import { ProductCard } from "@/components/shop/ProductCard";
 import { RangeShowcase } from "@/components/site/RangeShowcase";
 import { JourneyTimeline } from "@/components/site/JourneyTimeline";
 import { Testimonials } from "@/components/site/Testimonials";
 import { Button } from "@/components/ui/button";
-import { productsQuery } from "@/lib/catalogue";
 import { BUSINESS, CONTACT } from "@/lib/business";
 import { PHOTO, STUDIO_RANGE } from "@/assets/company";
-import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -59,9 +54,6 @@ function SectionHead({ title, kicker, action }: { title: string; kicker?: string
 }
 
 function Home() {
-  const [tab, setTab] = useState<string>("");
-  const products = useQuery({ ...productsQuery({ pageSize: 8, category: tab || undefined }), placeholderData: (prev) => prev });
-
   return (
     <>
       <ImmersiveHero />
@@ -79,71 +71,6 @@ function Home() {
         />
         <div className="mt-10">
           <RangeShowcase />
-        </div>
-      </section>
-
-      {/* E-commerce: the shop on the home page */}
-      <section id="shop" className="container-page scroll-mt-28 pt-20 sm:pt-28">
-        <SectionHead
-          kicker="Shop online"
-          title="Add to your kitchen in a few taps."
-          action={
-            <Button asChild variant="outline" size="sm">
-              <Link to="/shop">View all products</Link>
-            </Button>
-          }
-        />
-
-        <Reveal delay={80} className="mt-8 flex gap-2 overflow-x-auto pb-1 rail" role="tablist" aria-label="Filter products by range">
-          {[{ slug: "", name: "All" }, ...BUSINESS.publishedCategories.map((c) => ({ slug: c.dbSlug, name: c.name }))].map((t) => (
-            <button
-              key={t.slug || "all"}
-              type="button"
-              role="tab"
-              aria-selected={tab === t.slug}
-              onClick={() => setTab(t.slug)}
-              className={cn(
-                "type-small shrink-0 rounded-full px-5 py-2.5 font-medium transition-[background-color,color,box-shadow] duration-300",
-                tab === t.slug ? "bg-brand-gradient text-pepper-foreground shadow-[0_12px_28px_-14px_var(--color-pepper)]" : "bg-container text-foreground hover:bg-sage-strong",
-              )}
-            >
-              {t.name}
-            </button>
-          ))}
-        </Reveal>
-
-        <div className="mt-8" aria-live="polite">
-          {products.isPending ? (
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="overflow-hidden rounded-[1.5rem] border border-border bg-surface">
-                  <div className="aspect-square animate-pulse bg-container" />
-                  <div className="space-y-2 p-4">
-                    <div className="h-4 w-2/3 animate-pulse rounded-full bg-container" />
-                    <div className="h-4 w-1/3 animate-pulse rounded-full bg-container" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : products.isError ? (
-            <p className="type-body rounded-[1.5rem] bg-container p-10 text-center text-muted-foreground">We couldn't load products right now. Please refresh the page.</p>
-          ) : products.data.items.length === 0 ? (
-            <div className="rounded-[1.5rem] bg-sage p-12 text-center">
-              <h3 className="type-sub">{tab ? "Nothing in this range yet" : "New products are on their way"}</h3>
-              <p className="type-body mx-auto mt-3 max-w-md text-muted-foreground">Our shelves are being stocked. Check back soon, or contact us to order directly.</p>
-              <Button asChild className="mt-6">
-                <Link to="/contact">Contact us</Link>
-              </Button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
-              {products.data.items.map((p, i) => (
-                <Reveal key={p.id} delay={(i % 4) * 80} variant="scale">
-                  <ProductCard product={p} />
-                </Reveal>
-              ))}
-            </div>
-          )}
         </div>
       </section>
 

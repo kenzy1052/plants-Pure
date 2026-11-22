@@ -1,29 +1,11 @@
-# Plants & Pure update: files to copy into the repo
+# Update 2: files to copy over the repo (same paths)
 
-Copy everything in this folder over your project (same paths). Nothing else changes.
+- src/components/site/ImmersiveHero.tsx + immersive-hero.css: scroll film only at 1024px and wider; phones and tablets show the finished hero
+- src/components/site/RangeShowcase.tsx + growth.css: range cards are now wooden-table photos with overlay text
+- src/assets/ranges/scene-spices|herbs|oils|cereals.webp (NEW)
+- src/components/site/JourneyTimeline.tsx: flame travels the line, node pops on arrival, no counter
+- src/components/site/Footer.tsx: subscribe block now sits just above the copyright bar; social links are one row of circles
+- src/routes/index.tsx: "add to your kitchen" shop section removed
+- src/routes/about.tsx: story, mission and vision paragraphs use one font size
 
-## Do first (database)
-Run `supabase/migrations/20261120010000_growth_features.sql` once in the Supabase SQL editor.
-It creates subscribers, customer contacts and reviews, plus an automatic "save customer when an order is paid" trigger
-(and backfills people who have already paid). Safe to re-run.
-
-## NEW files
-- supabase/migrations/20261120010000_growth_features.sql
-- src/assets/ranges/*.webp (5 cut-out product images)
-- src/components/site/growth.css, JourneyTimeline.tsx, RangeShowcase.tsx, SubscribeForm.tsx, Testimonials.tsx
-- src/components/shop/Stars.tsx, ReviewForm.tsx
-- src/components/admin/ReviewsPanel.tsx, AudiencePanel.tsx
-- src/lib/growth.functions.ts, src/lib/testimonials.ts, src/lib/server/growth.server.ts
-- src/routes/testimonials.tsx, src/routes/unsubscribe.tsx
-
-## CHANGED files
-- src/lib/business.ts (story, mission, vision, journey, 4 ranges)
-- src/routes/index.tsx (new range cards, journey, testimonials, story copy)
-- src/routes/about.tsx (story, journey, mission/vision, testimonials)
-- src/routes/track.tsx (review form after delivery)
-- src/routes/admin.tsx (Reviews + Audience tabs)
-- src/components/site/Footer.tsx (subscribe + social)
-- src/routeTree.gen.ts (registers /testimonials and /unsubscribe)
-
-Resend, Supabase, Paystack and Cloudinary code is untouched; the new server code reuses the same helpers and env vars.
-Set the real LinkedIn company URL in `CONTACT.linkedin` (src/lib/business.ts).
+Optional clean-up: delete the old, now-unused src/assets/ranges/{spices,herbs,oils}-{bottle,pouch}.webp files.
