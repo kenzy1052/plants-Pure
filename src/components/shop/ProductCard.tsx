@@ -40,8 +40,8 @@ export function ProductCard({ product, priority = false }: { product: Product; p
   const image = product.images[0];
   const meta = [product.weight_grams ? `${product.weight_grams} g` : null, lowStock ? `Only ${product.stock} left` : null].filter(Boolean).join(" · ");
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden rounded-[1.25rem] border border-border bg-surface transition-[box-shadow,transform,border-color] duration-500 ease-[var(--ease-settle)] focus-within:ring-2 focus-within:ring-ring hover:-translate-y-1 hover:border-pepper/30 hover:shadow-lift">
-      <div className="relative aspect-square overflow-hidden bg-container">
+    <article className="group relative flex h-full flex-col bg-background focus-within:outline-none">
+      <div className="relative aspect-square overflow-hidden rounded-[1.25rem] bg-container ring-1 ring-inset ring-transparent transition-shadow duration-500 group-focus-within:ring-ring">
         <ProductImage src={image?.url} alt={image?.alt || product.title} priority={priority} w={600} square className={cn("transition-transform duration-[900ms] ease-[var(--ease-settle)] group-hover:scale-[1.06]", soldOut && "opacity-60 grayscale-[30%]")} />
         <div className="absolute left-2.5 top-2.5 flex flex-col items-start gap-1">
           {soldOut && <span className="type-label rounded-full bg-surface px-2 py-0.5 text-foreground">Sold out</span>}
@@ -49,7 +49,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
           {product.is_featured && !soldOut && <span className="type-label rounded-full bg-lime-gradient px-2 py-0.5 text-lime-foreground">Bestseller</span>}
         </div>
       </div>
-      <div className="flex flex-1 flex-col p-3 sm:p-3.5">
+      <div className="flex flex-1 flex-col px-0.5 pt-3">
         <h3 className="type-product truncate">
           {/* Stretched link: the whole card opens the product page (description, price, details). */}
           <Link to="/product/$slug" params={{ slug: product.slug }} title={product.title} className="transition-colors after:absolute after:inset-0 after:content-[''] hover:text-brand focus-visible:outline-none">
@@ -59,7 +59,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
         {(product.tagline || meta) && (
           <p className="type-small mt-0.5 truncate text-muted-foreground">{product.tagline || meta}</p>
         )}
-        <div className="mt-auto flex items-center justify-between gap-2 pt-3">
+        <div className="mt-auto flex items-center justify-between gap-2 pt-2.5">
           <Price price={product.price} compareAt={product.compare_at_price} className="type-body font-bold" />
           <button
             type="button"

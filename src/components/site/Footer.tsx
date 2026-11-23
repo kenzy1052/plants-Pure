@@ -35,7 +35,7 @@ export function Footer() {
   const showReviews = testimonialsVisible(reviews.data);
 
   return (
-    <footer className="mt-24 bg-night text-night-foreground">
+    <footer className="relative mt-24 border-t border-night-border bg-night text-night-foreground before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-pepper before:to-transparent">
       <div className="container-page grid gap-12 pt-16 pb-14 sm:grid-cols-2 lg:grid-cols-12">
         <div className="lg:col-span-4">
           <Logo className="h-24" />

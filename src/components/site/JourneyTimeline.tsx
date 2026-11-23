@@ -6,7 +6,7 @@ import "./growth.css";
 /** How long each chapter stays lit before the flame sets off for the next one (ms). */
 const DWELL_MS = 4800;
 /** Travel time for one hop along the line (seconds); extra hops add a little more. */
-const hopSeconds = (hops: number) => Math.min(2.8, 1.3 + (hops - 1) * 0.45);
+const hopSeconds = (hops: number) => Math.min(1.8, 1.05 + (hops - 1) * 0.25);
 
 function Odometer({ year }: { year: string }) {
   return (
@@ -87,7 +87,7 @@ export function JourneyTimeline({ id = "journey" }: { id?: string }) {
   // Autoplay: dwell on the lit chapter, then send the flame onwards (and back to the start after the last one).
   useEffect(() => {
     if (!inView || paused || reduced || travel) return;
-    const t = setTimeout(() => goTo(active >= last ? 0 : active + 1, active >= last ? 1.8 : undefined), DWELL_MS);
+    const t = setTimeout(() => goTo(active >= last ? 0 : active + 1, active >= last ? 1.4 : undefined), DWELL_MS);
     return () => clearTimeout(t);
   }, [inView, paused, reduced, travel, active, last, goTo]);
 
@@ -118,25 +118,22 @@ export function JourneyTimeline({ id = "journey" }: { id?: string }) {
       aria-label="Our journey so far"
       className="journey scroll-mt-28"
       data-travel={Boolean(travel)}
-      style={{ "--p": p, "--travel-dur": `${travel?.dur ?? 0}s` } as CSSProperties}
+      data-running={inView && !paused}
+      style={{ "--p": p, "--travel-dur": `${travel?.dur ?? 0}s`, "--dwell": `${DWELL_MS}ms` } as CSSProperties}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
     >
-      <span className="journey-orb" data-k="red" aria-hidden />
-      <span className="journey-orb" data-k="amber" aria-hidden />
+      <div className="journey-eyebrow" aria-hidden>
+        <span>Our journey</span>
+        <span className="journey-count"><b>{String(shown + 1).padStart(2, "0")}</b> / {String(items.length).padStart(2, "0")}</span>
+      </div>
 
       <div role="tablist" aria-label="Milestones" className="journey-track" onKeyDown={onKey}>
         <span className="journey-line" aria-hidden />
         <span className="journey-fill" aria-hidden />
-        <span className="journey-head" aria-hidden>
-          <span className="journey-tail" />
-          <span className="journey-core" />
-          <span className="journey-ember" />
-          <span className="journey-ember" />
-          <span className="journey-ember" />
-        </span>
+        <span className="journey-marker" aria-hidden />
         {items.map((it, i) => {
           const passing = Boolean(forward && travel && i > active && i < travel.to);
           const retreating = Boolean(travel && travel.to < active && i > travel.to && i <= active);
@@ -191,7 +188,10 @@ export function JourneyTimeline({ id = "journey" }: { id?: string }) {
         </div>
       </div>
 
-      <div className="mt-8 flex items-center justify-end gap-2">
+      <div className="journey-foot">
+        <span className="journey-dwell" aria-hidden>
+          {!reduced && <span key={`${active}-${String(Boolean(travel))}`} />}
+        </span>
         <button type="button" className="journey-ctrl" aria-label="Previous milestone" disabled={active === 0} onClick={() => goTo(shown - 1)}>
           <ArrowLeft className="h-4 w-4" />
         </button>
